@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE taglib
+        PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+	"http://java.sun.com/j2ee/dtd/web-jsptaglibrary_1_2.dtd">
+
+<taglib xmlns="http://java.sun.com/JSP/TagLibraryDescriptor">
+  <tlib-version>1.0</tlib-version>
+  <jsp-version>1.2</jsp-version>
+  <short-name>AVTag</short-name>
+  <description>
+    ArchiveViewer Tag Library
+  </description>
+  
+  <tag>
+    <name>print_request_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintRequestParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints the value of the specified request parameter
+    </description>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_full_error</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintFullErrorTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints all error stack traces
+    </description>
+  </tag>
+  
+  <tag>
+    <name>encode_url</name>
+    <tag-class>epics.archiveviewer.jsp.tag.EncodeURLTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Rewrites provided URL by adding a session id to it
+    </description>
+    <attribute>
+		<name>url</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>check_parameters</name>
+    <tag-class>epics.archiveviewer.jsp.tag.CheckParametersTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Checks query string of current URL for forbidden characters
+    </description>
+  </tag>
+
+  <tag>
+    <name>print_ads</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintArchiveDirectoriesTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+	Prints available archive directories, selecting the one that is in the body
+    </description>
+  </tag>
+
+  <tag>
+    <name>print_exporter_ids</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintExporterIdsTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints available exporter ids
+    </description>
+  </tag>
+    
+   <tag>
+    <name>print_methods</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintRetrievalMethodsTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints available retrieval methods
+    </description>
+    <attribute>
+		<name>purpose</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_matching_pv_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintMatchingPVParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints a parameter (name, directory, starttime, or endtime) of a matching PV
+	with the specified index
+    </description>
+    <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>one of the following: "name", "directory", "starttime", "endtime"</description> 
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_selected_pv_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintSelectedPVParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints a parameter (name, directory, starttime, or endtime) of a selected PV
+	with the specified index
+    </description>
+    <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>one of the following: "name", "directory", "starttime", "endtime"</description> 
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_graph_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintGraphParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints a parameter (name, directory, time_axis, range_axis, color, or draw_type) of a graph
+	with the specified index
+    </description>
+    <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>
+		one of the following: "name", "directory","time_axis", "range_axis", "color", "draw_type"</description> 
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_time_axis_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintTimeAxisParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints a parameter (name, starttime, endtime, location) of a time axis
+	with the specified index
+    </description>
+    <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>one of the following: "name", "starttime", "endtime", "location"</description> 
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>print_range_axis_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintRangeAxisParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints a parameter (name, min, max, type, location) of a range axis
+	with the specified index
+    </description>
+    <attribute>
+		<name>index</name>
+		<required>true</required>
+		<rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>one of the following: "name", "min", "max", "type", "location"</description> 
+    </attribute>
+  </tag>
+  
+   <tag>
+    <name>print_plot_title</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintPlotTitleTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	Prints the plot title
+    </description>
+  </tag>
+  
+  <tag>
+    <name>print_legend_parameter</name>
+    <tag-class>epics.archiveviewer.jsp.tag.PrintLegendParameterTag</tag-class>
+    <body-content>empty</body-content>
+    <description>
+	For one of the parameters (show_ave_name, show_archive_name, show_range, show_units) 
+	prints "checked = 'checked'" if true; else does nothing
+    </description>
+    <attribute>
+		<name>parameter</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+		<description>
+		one of the following: "show_ave_name", "show_archive_name", "show_range", "show_units"
+		</description> 
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>loop</name>
+    <tag-class>epics.archiveviewer.jsp.tag.LoopTag</tag-class>
+    <body-content>JSP</body-content>
+    <description>
+	Loops the value of a variable "counter" from 0 to the number of elements in the set specified by
+	the attribute "set"
+    </description>
+    <variable>
+	    <name-given>counter</name-given>
+	    <variable-class>Integer</variable-class>
+	    <declare>true</declare>
+	    <scope>NESTED</scope>
+  	</variable>
+    <attribute>
+		<name>set</name>
+		<required>true</required>
+        <description>one of these: "matching_pvs", "selected_pvs", "graphs","time_axes", "range_axes"</description> 
+    </attribute>
+  </tag>
+</taglib>

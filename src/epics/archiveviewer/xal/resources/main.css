@@ -1,0 +1,152 @@
+ body
+ {
+ background-color: #FFFFFF;
+ text-color: #000000;
+ font-family: Verdana, Arial, Clean, Helvetica, sans-serif;
+ font-size: 10pt;
+ }
+ 
+ p
+ {
+ margin-left: 15px;
+ }
+ 
+ p.main_title
+ {
+ text-align:center;
+ font-size:150%;
+ font-weight:bold;
+ }
+ 
+ p.page_title
+ {
+ margin-left: 0px;
+ background-color: #D8D8D8;
+ font-weight: bold;
+ font-size: 130%;
+ }
+ 
+ p.page_title:after
+ {
+ margin-left:15px;
+ }
+ 
+ div.navigation
+ {
+ font-weight:bolder;
+ font-size:120%;
+ margin-top:15px;
+ text-align:center;
+ }
+
+ div.navigation a
+ {
+ width:120px;
+ margin-left:2px;
+ background-color: #EEEEEE;
+ }
+ 
+ div.navigation a:link
+ {
+ color:#000000;
+ text-decoration:none;
+ }
+ 
+ div.navigation a:visited
+ {
+ text-decoration:none;
+ }
+ 
+ div.navigation a:hover
+ {
+ color:#000000;
+ text-decoration:underline;
+ }
+ 
+ div.news
+ {
+ margin-left:15px;
+ width:30%;
+ border:0;
+ border-style:solid;
+ border-right-width:1px;
+ border-bottom-width:1px;
+ border-color:#D8D8D8;
+ }
+ 
+ div.news span.date
+ {
+ font-weight:bold;
+ }
+ 
+ div.list_header
+ {
+ background-color: #D8D8D8;
+ font-weight: bold;
+ width:50%;
+ }
+ 
+ ul.level_0
+ {
+ list-style-type: circle;
+ }
+ 
+ ul.level_1
+ {
+ list-style-type: disc;
+ }
+ 
+ ul.no_marks
+ {
+ list-style-type:none;
+ }
+ 
+ ol.level_0
+ {
+ list-style-type:decimal;
+ }
+ 
+ ol.level_1
+ {
+ list-style-type:lower-roman;
+ }
+ 
+ ol.manual
+ {
+ list-style-type:decimal;
+ }
+ 
+ ol.manual li
+ {
+ margin-top:10px;
+ }
+ 
+ p.paragraph_title
+ {
+ font-weight:bold;
+ }
+ 
+ div.signature
+ {
+ text-align:right;
+ font-size:75%;
+ }
+ 
+ div.commandline_options
+ {
+ position:relative;
+ top:20px;
+ }
+ 
+ div.commandline_options div.left
+ {
+ width:300px;
+ height:20px;
+ }
+ 
+ div.commandline_options div.right
+ {
+ position:relative;
+ top:-20px;
+ left:200px;
+ }

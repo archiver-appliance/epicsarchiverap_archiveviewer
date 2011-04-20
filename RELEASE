@@ -1,0 +1,50 @@
+Go to http://ics-web1.sns.ornl.gov/archive/viewer for more information
+
+ArchiveViewer Release Info
+
+* 1.0.4
+Has been running in the SNS control room for a while.
+Details unknown.
+
+* 1.2 Alpha
+The version number reported by the sources until March 15, 2006.
+Probably applies to the 1.2 beta features.
+
+* 1.2 Beta
+Features:
+	pluggable clients support
+	pluggable plot widgets support
+	pluggable exporters support 
+	multiple time and range axes
+	search using regular expressions
+	handler for invalid data
+	three plot styles (scatter, line, and steps)
+	formulas (basic arithmetics and boolean operations)
+	plot zoom/scroll handlers
+	relative time queries
+	persistent configurations
+	progress indicators
+	fully integrated into XAL framework
+	100% MVC compliance
+Includes:
+	ArchiveViewer Base 
+	Command line, JSP, and XAL views
+	ChannelArchiver client
+	Plot plugin for regular time plots
+	Plot plugin for waveform time plots
+	Plot plugin for correaltion plots
+	Exporter to spreadsheet-like text files
+
+* 1.2 SNS 2
+Paul Chu:
+- Excluded unused code from the application jar,
+  reducing archiveviewer.jar from 15MB to only 5MB.
+
+Kay Kasemir:
+- Modified build.xml to generate 'archiveviewer' script with
+  default URL 'ics-srv-web2.sns.ornl.gov' instead of 'archive1'.
+- Patched epics/archiveviewer/clients/channelarchiver/ArchiverClient.java
+  to avoid overrun in nanosecond computation.
+  Viewer used to request start/end times with nonsensical nanoseconds,
+  which crashed the old data server when built with EPICS base R3.14.8.
+

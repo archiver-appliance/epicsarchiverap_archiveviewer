@@ -1,0 +1,549 @@
+<html>
+<head>
+<title>EPICS ArchiveViewer Page</title>
+<link rel="stylesheet" type="text/css" href="main.css">
+</head>
+
+<body>
+<p class="main_title">EPICS ArchiveViewer</p>
+
+<p class="page_title">USER'S ONLINE GUIDE (version 1.2)
+</div>
+<ol>
+	<li><a href="#starting">Starting the Application</a></li>
+	<li><a href="#basics">Basics</a></li>
+	<li><a href="#axes">Axes Configuration</a></li>
+	<li><a href="#entering_times">Entering Times</a></li>
+	<li><a href="#formulas">Formulas</a></li>
+	<li><a href="#graphs">Graphs Configuration</a></li>
+	<li><a href="#export">Export</a></li>
+	<li><a href="#menubar">Menubar</a></li>
+	<li><a href="#plotplugin_features">General Plot Plugin Features</a></li>
+</ol>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<ol class="manual">
+	<li>
+	<p class="paragraph_title"><a name="starting">Starting the Application</a></p>
+	WEB START users, please read the information on the page where you got
+	the program. Other users, please continue.<br>
+	<br>
+	To start ArchiveViewer, make sure JAVA_HOME is defined. <br>
+	Change to the directory that contains archiveviewer.jar.<br>
+	Type <u>java -jar archiveviewer.jar [-options]</u>, where [-options]
+	can be one (or sometimes more) of these:
+	<div class="commandline_options">
+	<div class="left">-u "url"</div>
+	<div class="right">Connects to the archive data server at the specified
+	URL</div>
+	<div class="left">-f "config file"</div>
+	<div class="right">Loads a configuration file</div>
+	<div class="left">-a "name"</div>
+	<div class="right">Selects the specified archive</div>
+	<div class="left">-d "absolute path"</div>
+	<div class="right">Sets your home directory (e.g. for config files)</div>
+	<div class="left">-v(ersion)</div>
+	<div class="right">Prints version info</div>
+	<div class="left">-h(elp)</div>
+	<div class="right">Prints this info</div>
+	</div>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="basics">Basics</a></p>
+	<ul class="level_0">
+		<li>
+		<p class="paragraph_title">Main Components</p>
+		ArchiveViewer consists of 4 major components.
+		<ul class="level_1">
+			<li>The control panel contains the ArchiveViewer entries (AVEs)
+			configurator (on the left) and the axes configurator (on the right)</li>
+			<li>The tabbed pane at the bottom shows loaded plot plugins</li>
+			<li>Between control panel and plot plugins panel is a (narrow) status
+			panel. The status panel shows important static as well as dynamic
+			information. There is also a progress bar (on the right).<br>
+			Tip: Always take a look at the status panel, when you are not sure if
+			a task is running.</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Main steps</p>
+		If you use command line options, you might not need to perform some of
+		these steps.<br>
+		If you don't, but possess a configuration file, you can load it now
+		(see <a href="#menubar">Menubar</a>).<br>
+		The default procedure though is the following:
+		<ul class="level_1">
+			<li>go to FILE menu and select NEW CONNECTION (FILE => NEW
+			CONNECTION)</li>
+			<li>select (or enter) the URL of the desired archive data server and
+			press OK</li>
+			<li>after the server information was retrieved, you can select a
+			desired archive directory in the main panel</li>
+			<li>Enter a search string into the main text field; press SEARCH or
+			hit ENTER.<br>
+			A window pops up that allows you to configure your search. Its right
+			half is empty at first, but will soon be filled with meta data of
+			matching PVs (if it doesn't happen soon, please take a look at the
+			progress in the status panel => perhaps you simply asked for too many
+			PVs)</li>
+			<li>Select your desired PVs and add them to the main panel by
+			pressing ADD (or you can just double click on a particular PV)</li>
+			<li>Close or move away the search window</li>
+			<li>If desired, enter time ranges for the MAIN TIME AXIS (we
+			facilitate this by providing the TIME SELECTORs that appear when you
+			press one of the "..."- buttons next to time entry fields)</li>
+			<li>Press PLOT and wait</li>
+			<li>After data is retrieved, you can access tooltips that contain
+			further information about AVEses by holding the mouse for about 2
+			seconds over corresponding AVE table cells.</li>
+		</ul>
+	</ul>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="axes">Axes Configuration</a></p>
+	You can configure time and range axes on the right side of the control
+	panel
+	<ol class="level_1">
+		<li>
+		<p class="paragraph_title">Time Axis</p>
+		Enter either absolute or relative time strings (see <a
+			href="#entering_times">Entering Times</a>) into the fields under the
+		time axes box. Alternatively, you can use time selectors that appear
+		when you press the "..." button next to the proper text field.<br>
+		Tip: There are syntax tooltips available if you hold the mouse over a
+		text field for about 2 seconds.<br>
+		Under the time fields, a box lets you select a location for your time axis.</li>
+		<li>
+		<p class="paragraph_title">Range axis</p>
+		Enter numeric values into the min/max text fields under the range axes box.
+		Java understands a huge variety of number formats (e.g. <i>1e-1</i> is
+		allowed), so just try some out, and please do tell us if you think
+		some currently unsupported formats should be added. <br>
+		Note: If you enter nothing, the value is considered to be "whatever it
+		actually is".<br>
+		You can specify the scale type and the location of the range axis by
+		selecting the values in corresponding combo boxes. Currently supported range
+		axes types are NORMAL and LOG(arithmic).</li>
+		<li>
+		<p class="paragraph_title">Advanced settings</p>
+		You can access advanced axes features by clicking the "..." to the
+		right of the axis name.<br>
+		The options here are:
+		<ul class="level_0">
+			<li>"add new axis" pops up a dialog and asks you to enter a
+			unique label of the new axis.</li>
+			<li>"remove selected axis" (note: you can not remove the last axis)</li>
+			<li>"rename selected axis" </li>
+			<li>"update selected axis from active chart" updates the range of the
+			corresponding axis to what is shown by the currently active chart</li>
+			<li>"update all axes from active chart" updates all ranges of the
+			axes to what is shown by the currently active chart</li>
+			<li>"reset selected axis" resets the corresponding axis range</li>
+			<li>"reset all axes" resets all axes ranges</li>
+		</ul>
+		</li>
+	</ol>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="entering_times">Entering Times</a></p>
+	Times can be entered either manually or through time selectors, which
+	appear when you press one of the "..."- buttons to the right of the
+	proper textfield in the time axes panel. Even if you decide to never
+	enter times manually, you should read this reference.
+	<ul class="level_1">
+		<li>
+		<p class="paragraph_title">Absolute Times</p>
+		You can enter absolute times for start and end times of a query. Many
+		of absolute time string components are optional.<br>
+		The format for absolute time strings is shown as a tool tip on a time text field. The minimal,
+		mandatory, absolute time string must follow the pattern 'MM/dd' (MM is
+		the month, dd- the day of month)<br>
+		The application will automatically enter these values for missing time
+		components:
+		<ul class="level_2">
+			<li>year: current system year</li>
+			<li>hours: 00</li>
+			<li>minutes: 00</li>
+			<li>seconds: 00</li>
+			<li>msecs: 000</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Keyword "now"</p>
+		The application accepts the keyword "now". Milliseconds before the
+		server request is actually sent, "now" is replaced by the current
+		system time.<br>
+		Please note: If you press PLOT without checking "Keep Plot Ranges",
+		despite caching new data request will be generated because "now" is resolved to a later value.</li>
+		<li>
+		<p class="paragraph_title">Relative Times</p>
+		One of ArchiveViewer's most innovative features is its ability to
+		parse relative time strings. Unfortunately, as with all innovations,
+		the correct usage requires some learning time. 
+		<ol>
+			<li>Following tokens are accepted for each of the relative time
+			components (please, note that they indeed are <u>case sensitive</u>):
+			<ul class="level_0">
+				<li>y - year</li>
+				<li>M - month</li>
+				<li>d - day</li>
+				<li>H - hours</li>
+				<li>m - minutes</li>
+				<li>s - seconds</li>
+			</ul>
+			</li>
+			<li>For numeric values, only integers are allowed. For positive
+			integers, you may also use the preceeding "+" sign, which would
+			makes sense semantically</li>
+			<li>Finally, you can use absolute time entries at the end of each
+			relative <i>date</i> string.</li>
+			<li>Here are some examples of relative time strings:
+			<ul class="level_0">
+				<li>
+				<p class="paragraph_title">Legal</p>
+				"+1d", "6m", "-1M 6d", "-8H", "-2d 08:00" (note: no spaces are
+				allowed between numbers and relative time tokens)</li>
+				<li>
+				<p class="paragraph_title">Illegal</p>
+				"-1D", "+2 y", "2.5H"</li>
+			</ul>
+			</li>
+			<li>Semantics
+			<ul class="level_0">
+				<li>The sole notion of "relative" time strings requires some kind of
+				a base, and indeed there is something we call "base times",
+				relatively to which "relative times" are resolved. In very
+				most cases, base times can be determined intuitively.<br>
+				We call a relative time string
+				"positive", if the result of parsing and calculating it (in seconds)
+				is a positive number; and we call such string "negative", if the
+				result is a negative number. Please, note that it makes no sense to use positive relative
+				time strings for the start time of a query.</li>
+				<li>All in all, there are 6 cases to consider:
+				<ol class="level_0">
+					<li>Start time is absolute; end time is absolute<br>
+					Example:<br>
+					Start: 01/01/2003 8:00 <br>
+					End: 01/02/2003</li>
+					<li>Start time is negative relative; end time is absolute => base
+					time: end time<br>
+					Example:<br>
+					Start: -10d<br>
+					End: now<br>
+					Means: <i>retrieve data from the last 10 days</i></li>
+					<li>Start time is absolute; end time is positive relative => base
+					time: start time<br>
+					Example:<br>
+					Start: 01/02/2004 10:00<br>
+					End: +8H<br>
+					Means: <i>retrieve data that was generated on January 2nd 2004
+					between 10am and 6pm </i></li>
+					<li>Start time is negative relative; end time is positive relative
+					=> base time for start time: "now"; base time for end time: start
+					time<br>
+					Example:<br>
+					Start: -7d 8:00<br>
+					End: +8H<br>
+					Means: <i>retrieve data from the current shift a week ago</i></li>
+					<li>Start time is absolute; end time is negative relative => base
+					time: "now"<br>
+					Example:<br>
+					Start: 06/01/2004<br>
+					End: -5d<br>
+					Means: <i>retrieve data from the 1st of June up to 5 days ago from
+					now </i></li>
+					<li>Start time is negative relative; end time is negative relative
+					=> base times: "now" for both time strings<br>
+					Example:<br>
+					Start: -10d<br>
+					End: -5d +8H<br>
+					Means: <i>retrieve data from 10 days ago upto 5 days ago, plus 8
+					more hours of data </i></li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+			<li>Conclusion<br>
+			Relative time strings is a fairly intuitive and very useful feature because 
+			they allow automated processing of many desirable
+			configurations (just think how easily you can retrieve "yesterday's
+			shift data" day after day).</li>
+		</ol>
+		</li>
+	</ul>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="formulas">Formulas</a></p>
+	One of the more complex features of the ArchiveViewer is the ability to
+	use PVs from <u>common</u> archive directories in a formula that is treated like a genuine PV
+	by the application.<br>
+	You can create a new formula by loading the formula configurator when
+	you press the "NEW FORMULA"- button on the main controls panel.<br>
+	<br>
+	Following steps are recommended for creating a formula:<br>
+	<ul class="level_1">
+		<li>Select PVs from the supplied PV list</li>
+		<li>Assign a unique variable to each PV (default variables will be x0,
+		x1, etc.)</li>
+		<li>Using these variables, type in your formula, possibly using the
+		supplied calculator UI</li>
+	</ul>
+	Variables have two major advantages: resulting formulas will be short
+	and thus, well readable; and complex formulas could be re-used for
+	other PVs without much hassle.<br>
+	<p class="paragraph_title">Supported functions</p>
+	Besides basic arithmetics and binary operations, all functions
+	specified by methods of the <a
+		href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Math.html"
+		target="_blank">java.lang.Math class</a> as well as min, max, and
+	arithmetic mean functions (with indefinite number of arguments) are
+	supported by the internal formula parser.</li>
+	<li>
+	<p class="paragraph_title"><a name="graphs">Graphs Configuration</a></p>
+	The ArchiveViewer assigns default colors, plot types, and time/range
+	axes to each graph (i.e. a genuine PV or a formula). By pressing the
+	"..."-button next to each graph name, you can change these settings.
+	<ol class="level_1">
+		<li>
+		<p class="paragraph_title">Axes selection</p>
+		The labels in the selection box correspond to the labels of the axes
+		in the main control panel. <br>
+		Note: If you want to plot a graph <i>normalized</i>, select the empty entry in the box</li>
+		<li>
+		<p class="paragraph_title">Color</p>
+		</li>
+		<li>
+		<p class="paragraph_title">Draw types</p>
+		<ul class="level_0">
+			<li>scatter</li>
+			<li>lines: connects graph data points directly</li>
+			<li>steps: connects data points of a graph by drawing a
+			horizontal line and then a vertical line (like a step). This draw
+			type is default/li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Width</p>
+		You can adjust the width of graph lines with this slider</li>
+		<li>
+		<p class="paragraph_title">Visibility</p>
+		Uncheck the visibility box, if you don't want to display the graph in
+		the next plot. This might be useful if, for example, you 'd like to
+		see the underlying graphs.</li>
+	</ol>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="export">Export</a></p>
+	<ul class="level_0">
+		<li>The export dialog is located under FILE => Export...</li>
+		<li>
+		<p class="paragraph_title">Basic configuration</p>
+		<ul class="level_1">
+			<li>Generally speaking, you always have to select one archive
+			directory from which you want to export data. However, exporting data
+			from more than one archive at the same time might be supported by
+			some servers, too.</li>
+			<li>By selecting "Selected Graphs Only", you can make the program
+			export data of selected PVs and formulas only.</li>
+			<li>You can enter a new time range for the query. Alternatively, you
+			can load time ranges from the currently selected time axis.</li>
+			<li>The application contains an internal exporter that prints data in CSV format (actually,
+			separated by tabs). Other exporters can be plugged in.</li>
+			<li>Per default, data is exported to an output window. However, you can bypass it 
+			by specifying a file. You can type a file path to the
+			desired file manually, or you can select a file after pressing the
+			"..."- button</li>
+			<li>As soon as you press OK, the export starts. Please take notice of
+			the export progress. If it seems to take too much time or just to be
+			too much data, you may interrupt the request (by pressing the red button next to progress bar). 
+			<br>Note: data that was exported before interruption remains available</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Advanced configuration</p>
+		<ul class="level_1">
+			<li>You can reach advanced settings by pressing the "..."- button and then selecting
+			the "MORE..." menu item.
+			</li>
+			<li>The method combobox contains data retrieval methods for export
+			that are supported by current archive server.
+			</li>
+			<li>You may enter a maximum number of data samples per PV.</li>
+			<li>For some export methods, it will make more sense to enter a
+			period of time for which you want a single sample (this field and the
+			"max number of values" field are symbiotic)</li>
+			<li>You may enter your own timestamp format (useful, for instance, if
+			you are going to send the file to Europe). Please, use the tooltip to
+			see the supported syntax.</li>
+			<li>Finally, you can export data as well as status information, or
+			just pure data.</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="menubar">Menubar</a></p>
+	<ol class="level_1">
+		<li>
+		<p class="paragraph_title">FILE menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">New Connection</p>
+			pops up a dialog where you can enter the connection parameters for
+			the data server</li>
+			<li>
+			<p class="paragraph_title">Reconnect</p>
+			Sometimes there are (network) errors that may corrupt current connection
+			to the data server. Simply press this menu button to re-establish the
+			connection</li>
+			<li>
+			<p class="paragraph_title">Open, Open Recent..., Save, Save As</p>
+			These menu buttons are used for loading and saving the PVs/axes
+			configuration from the main controls panel. <br>
+			Note: For preferences stuff, please go to the EDIT menu.</li>
+			<li>
+			<p class="paragraph_title">Export</p>
+			See <a href="#export">here</a>.</li>
+			<li>
+			<p class="paragraph_title">Print... and Page Setup...</p>
+			Displays widgets for printing the application window</li>
+			<li>
+			<p class="paragraph_title">Clear All</p>
+			Clears all information in the main window.</li>
+			<li>
+			<p class="paragraph_title">Quit</p>
+			Exits the application</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">EDIT menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">Copy, cut, paste</p>
+			standard menu items, have the same effects as corresponding keyboard
+			short cuts (e.g. Ctrl+x etc. on Windows)</li>
+			<li>
+			<p class="paragraph_title">Preferences</p>
+			Includes a plot title setter, a legend configurator, and a plot
+			plugin loader</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">VIEW menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">Search Dialog</p>
+			Displays the search dialog
+			</li>
+			<li>
+			<p class="paragraph_title">Full Screen</p>
+			Resizes the main window to occupy the entire screen</li>
+			<li>
+			<p class="paragraph_title">Show Console, Show Event Log, Show Memory
+			Console</p>
+			Some of XAL widgets</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">TOOLS menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">Assign Selected Archive</p>
+			Assigns the selected archive to selected graphs (useful for formulas,
+			or if archive names changed etc.)</li>
+			<li>
+			<p class="paragraph_title">Clear Cache</p>
+			Clears all cached data</li>
+		</ul>
+		<li>
+		<p class="paragraph_title">WINDOW menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">Capture As PNG...</p>
+			Does the same as the PRINT SCREEN key, but is more specific</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">HELP menu</p>
+		<ul class="level_0">
+			<li>
+			<p class="paragraph_title">Contents</p>
+			Opens this guide</li>
+			<li>
+			<p class="paragraph_title">Server Info</p>
+			Shows information that the current archive server might have on
+			itself</li>
+			<li>
+			<p class="paragraph_title">About</p>
+			Some basic information on the application</li>
+		</ul>
+		</li>
+	</ol>
+	</li>
+	<li>
+	<p class="paragraph_title"><a name="plotplugin_features">General Plot
+	Plugin Features</a></p>
+	Note: some plot plugins may support only subsets of these
+	features, others may have more functionality. Please, check proper user	manuals.
+	<ol class="level_1">
+		<li>
+		<p class="paragraph_title">Plot legend</p>
+		Consists at least of colorful shapes. To configure the legend, please
+		go to EDIT => Preferences...</li>
+		<li>
+		<p class="paragraph_title">Zoom in</p>
+		You can zoom into the plot with your left mouse. There is a minimum
+		dragging distance required to activate the zoom capability. This prevents
+		accidental mouse "hang ups".</li>
+		<li>
+		<p class="paragraph_title">Plot manipulation buttons</p> <br>
+		From left to right:
+		<ul class="level_0">
+			<li>goes back in time the time range(s) you currently see on screen</li>
+			<li>goes forth in time the time range(s) you currently see on screen
+			</li>
+			<li>goes "up" the value range(s) you currently see on screen</li>
+			<li>goes "down" the value range(s) you currently see on screen</li>
+			<li>doubles the time range(s) you currently see on screen</li>
+			<li>doubles the value range(s) you currently see on screen</li>
+			<li>zooms out if you previously zoomed in (note: will be moved to the
+			right mouse button - menu in nearest future)</li>
+			<li>displays a menu for advanced configuration:
+			<ul>
+				<li>uses anti-alias drawing method if checked</li>
+				<li>leaves ignored items if checked and no new data is retrieved</li>
+			</ul>
+			</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Some typical "right mouse click" menu -
+		features</p>
+		<ul class="level_0">
+			<li>Properties: some chart specific properties</li>
+			<li>Save as... : saves the plot as a PNG image</li>
+			<li>Print... : prints the plot</li>
+			<li>Ignore Item... : ignores the current plot item (may be inactive)</li>
+		</ul>
+		</li>
+		<li>
+		<p class="paragraph_title">Dock/undock</p>
+		In the top right corner of a plot plugin panel, there is the
+		dock/undock button. <br>
+		Please, note that once a plot plugin is undocked, it can not be
+		controlled from the main controls panel. However, zoom-in and plot
+		manipulation buttons should continue to function.</li>
+	</ol>
+	</li>
+</ol>
+
+<div class="signature">Written by Sergei Chevtsov (chevtsovs@ornl.gov)
+April 11th, 2005</div>
+
+</body>
+</html>

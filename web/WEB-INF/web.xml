@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>ArchiveViewer JSP</display-name>
+	<servlet>
+		<servlet-name>connect</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.ConnectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>connect</servlet-name>
+		<url-pattern>/connect</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>search</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.SearchServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>search</servlet-name>
+		<url-pattern>/search</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>processPVSelection</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.ProcessPVSelectionServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>processPVSelection</servlet-name>
+		<url-pattern>/processPVSelection</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>processPVConfigurationForPlot</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.ProcessPVConfigurationForPlotServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>processPVConfigurationForPlot</servlet-name>
+		<url-pattern>/processPVConfigurationForPlot</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>export</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.ExportServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>export</servlet-name>
+		<url-pattern>/export</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>plotDirectly</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.PlotDirectlyServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>plotDirectly</servlet-name>
+		<url-pattern>/plotDirectly</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>exportDirectly</servlet-name>
+		<servlet-class>epics.archiveviewer.jsp.servlet.ExportDirectlyServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>exportDirectly</servlet-name>
+		<url-pattern>/exportDirectly</url-pattern>
+	</servlet-mapping>
+	
+	<taglib>
+		<taglib-uri>av-tag</taglib-uri>
+		<taglib-location>/WEB-INF/AVTag.tld</taglib-location>
+	</taglib>
+	
+</web-app>
+
