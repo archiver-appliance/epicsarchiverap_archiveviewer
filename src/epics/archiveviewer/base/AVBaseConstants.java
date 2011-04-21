@@ -67,7 +67,7 @@ public interface AVBaseConstants {
 	public static final float MIN_DRAW_WIDTH = 1;
 	public static final float MAX_DRAW_WIDTH = 11;
 	
-	public static final String AV_CLIENT_CLASS_NAME = "epics.archiveviewer.clients.channelarchiver.ArchiverClient";
+	public static final String AV_CLIENT_CLASS_NAME = "epics.archiveviewer.clients.appliancearchiver.RawPBPlugin";
 	public static final String[] AVAILABLE_PLOT_PLUGINS_CLASS_NAMES = 
 		new String[]
 		           {
