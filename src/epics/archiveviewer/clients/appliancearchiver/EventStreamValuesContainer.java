@@ -21,6 +21,10 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	private double maxValue = Double.MIN_VALUE;
 	private double minPosValue = Double.MAX_VALUE;
 	
+	long minTimeMs = Long.MAX_VALUE;
+	long maxTimeMs = 0L;
+	
+	
 	public EventStreamValuesContainer(AVEntry av, EventStream strm) {
 		this.avEntry = av;
 		try {
@@ -30,6 +34,9 @@ public class EventStreamValuesContainer implements ValuesContainer {
 				if(val < minValue) minValue = val;
 				if(val > 0 && val < minPosValue) minPosValue = val;
 				if(val > maxValue) maxValue = val;
+				long currenttsms = pbe.getEpochSeconds()*1000;
+				if(currenttsms < minTimeMs) minTimeMs = currenttsms;
+				if(currenttsms > maxTimeMs) maxTimeMs = currenttsms;
 				events.add(pbe);
 			}
 		} finally {
@@ -89,8 +96,9 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public Vector getValue(int index) throws Exception {
+		double val = events.get(index).getValue();
 		Vector<Double> ret = new Vector<Double>();
-		ret.add(new Double(events.get(index).getValue()));
+		ret.add(new Double(val));
 		return ret;
 	}
 
@@ -106,7 +114,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public int getPrecision() {
-		return 0;
+		return 10;
 	}
 
 	@Override

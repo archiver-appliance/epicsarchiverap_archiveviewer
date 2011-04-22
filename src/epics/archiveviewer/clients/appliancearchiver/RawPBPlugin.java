@@ -67,7 +67,10 @@ public class RawPBPlugin implements ClientPlugin {
 		EventStream st = storagePlugin.getDataForPV(pvName, start, end);
 		if(st != null) {
 			ValuesContainer[] ret = new ValuesContainer[1];
-			ret[0] = new EventStreamValuesContainer(archiveEntries[0], st);
+			EventStreamValuesContainer vals = new EventStreamValuesContainer(archiveEntries[0], st);
+			ret[0] = vals;
+			logger.info("Found " + vals.getNumberOfValues() + " ranging between " + vals.getMinValidValue() + " to " + vals.getMaxValidValue() 
+					+ " with time between " + vals.minTimeMs + "(ms) and " + vals.maxTimeMs + "(ms)");
 			return ret;
 		}
 
