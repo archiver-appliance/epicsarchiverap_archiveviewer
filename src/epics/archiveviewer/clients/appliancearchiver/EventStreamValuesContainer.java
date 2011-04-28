@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import org.epics.archiverappliance.Event;
 import org.epics.archiverappliance.EventStream;
+import org.epics.archiverappliance.data.DBRTimeEvent;
 
 import edu.stanford.slac.archiverappliance.PlainPB.PBEvent;
 import epics.archiveviewer.AVEntry;
@@ -16,7 +17,7 @@ import epics.archiveviewer.ValuesContainer;
  */
 public class EventStreamValuesContainer implements ValuesContainer {
 	private AVEntry avEntry;
-	private Vector<PBEvent> events = new Vector<PBEvent>();
+	private Vector<DBRTimeEvent> events = new Vector<DBRTimeEvent>();
 	private double minValue = Double.MAX_VALUE;
 	private double maxValue = Double.MIN_VALUE;
 	private double minPosValue = Double.MAX_VALUE;
@@ -29,15 +30,15 @@ public class EventStreamValuesContainer implements ValuesContainer {
 		this.avEntry = av;
 		try {
 			for(Event e : strm) {
-				PBEvent pbe = (PBEvent) e;
-				double val = pbe.getValue();
+				DBRTimeEvent dbrevent = (DBRTimeEvent) e;
+				double val = dbrevent.getSampleValue().getValue().doubleValue();
 				if(val < minValue) minValue = val;
 				if(val > 0 && val < minPosValue) minPosValue = val;
 				if(val > maxValue) maxValue = val;
-				long currenttsms = pbe.getEpochSeconds()*1000;
+				long currenttsms = dbrevent.getEpochSeconds()*1000;
 				if(currenttsms < minTimeMs) minTimeMs = currenttsms;
 				if(currenttsms > maxTimeMs) maxTimeMs = currenttsms;
-				events.add(pbe);
+				events.add(dbrevent);
 			}
 		} finally {
 			strm.close();
@@ -76,7 +77,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String valueToString(int index, int item) throws Exception {
-		return String.valueOf(events.get(index).getValue());
+		return events.get(index).getSampleValue().toString();
 	}
 
 	@Override
@@ -96,9 +97,9 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public Vector getValue(int index) throws Exception {
-		double val = events.get(index).getValue();
-		Vector<Double> ret = new Vector<Double>();
-		ret.add(new Double(val));
+		Number val = events.get(index).getSampleValue().getValue(index);
+		Vector<Number> ret = new Vector<Number>();
+		ret.add(val);
 		return ret;
 	}
 
