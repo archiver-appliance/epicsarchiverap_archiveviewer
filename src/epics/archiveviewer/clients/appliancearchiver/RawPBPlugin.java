@@ -3,13 +3,15 @@ package epics.archiveviewer.clients.appliancearchiver;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.epics.archiverappliance.Event;
 import org.epics.archiverappliance.EventStream;
-import org.epics.archiverappliance.utils.TimeStamp;
+import org.epics.archiverappliance.data.DBRTimeEvent;
+import org.epics.archiverappliance.retrieval.client.RawDataRetrieval;
 
-import edu.stanford.slac.archiverappliance.PBOverHTTP.PBOverHTTPStoragePlugin;
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.AVEntryInfo;
 import epics.archiveviewer.ArchiveDirectory;
@@ -21,7 +23,7 @@ import epics.archiveviewer.ValuesContainer;
 import epics.archiveviewer.clients.channelarchiver.RetrievalMethodImpl;
 
 public class RawPBPlugin implements ClientPlugin {
-	private Logger logger = Logger.getLogger(RawPBPlugin.class.getName());
+	private static Logger logger = Logger.getLogger(RawPBPlugin.class.getName());
 	private String serverURL = null;
 	private RetrievalMethod[] retrievalMethodsForPlot = {
 			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true)
@@ -51,29 +53,42 @@ public class RawPBPlugin implements ClientPlugin {
 		serverURL = urlStr;
 	}
 	
+	
 	@Override
-	public ValuesContainer[] retrieveData(AVEntry[] archiveEntries,
+	public ValuesContainer[] retrieveData(final AVEntry[] archiveEntries,
 			RequestObject requestObject, ProgressTask progressInfo)
 			throws Exception {
-		String pvName = archiveEntries[0].getName();
-		logger.info("retrieveData called for " + pvName + " from " + requestObject.getStartTimeInMsecs() + " to " + requestObject.getEndTimeInMsecs());
-		PBOverHTTPStoragePlugin storagePlugin = new PBOverHTTPStoragePlugin();
-		storagePlugin.initialize(serverURL + "/data/getData.raw");
-		
-		TimeStamp start = TimeStamp.timestampOf(new Date((long) requestObject.getStartTimeInMsecs()));
-		TimeStamp end = TimeStamp.timestampOf(new Date((long) requestObject.getEndTimeInMsecs()));
+		ArrayList<String> pvNames = new ArrayList<String>();
+		for(AVEntry archiveEntry : archiveEntries) {
+			pvNames.add(archiveEntry.getName());
+		}
+		String[] pvNamesArray = pvNames.toArray(new String[0]); 
 
-		long s = System.currentTimeMillis();
-		EventStream st = storagePlugin.getDataForPV(pvName, start, end);
-		if(st != null) {
-			ValuesContainer[] ret = new ValuesContainer[1];
-			EventStreamValuesContainer vals = new EventStreamValuesContainer(archiveEntries[0], st);
-			ret[0] = vals;
-			long e = System.currentTimeMillis();
-			logger.info("Found " + vals.getNumberOfValues() + " ranging between " + vals.getMinValidValue() + " to " + vals.getMaxValidValue() 
-					+ " with time between " + vals.minTimeMs + "(ms) and " + vals.maxTimeMs + "(ms)"
-					+ " in " + (e-s) + "(ms)");
-			return ret;
+		// We are skipping the nanos when making the request to the server.
+		Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
+		Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
+
+		// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
+		RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
+
+		long before = System.currentTimeMillis();
+		RawRetrievalEventProcessor retrievalProcessor = new RawRetrievalEventProcessor(archiveEntries);
+		EventStream strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, retrievalProcessor);
+		long totalValues = 0;
+		if(strm != null) {
+			try {
+				for(Event e : strm) {
+					DBRTimeEvent dbrevent = (DBRTimeEvent) e;
+					retrievalProcessor.currentVals.add(dbrevent);
+					totalValues++;
+				}
+			} finally {
+				strm.close();
+			}
+
+			long after = System.currentTimeMillis();
+			logger.info("Retrieved " + totalValues	+ " values in " + (after-before) + "(ms)");
+			return retrievalProcessor.valueContainers;
 		}
 
 		return null;

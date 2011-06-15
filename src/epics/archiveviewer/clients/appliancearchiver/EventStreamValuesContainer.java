@@ -2,11 +2,8 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.util.Vector;
 
-import org.epics.archiverappliance.Event;
-import org.epics.archiverappliance.EventStream;
 import org.epics.archiverappliance.data.DBRTimeEvent;
 
-import edu.stanford.slac.archiverappliance.PlainPB.PBEvent;
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.ValuesContainer;
 
@@ -26,23 +23,19 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	long maxTimeMs = 0L;
 	
 	
-	public EventStreamValuesContainer(AVEntry av, EventStream strm) {
+	public EventStreamValuesContainer(AVEntry av) {
 		this.avEntry = av;
-		try {
-			for(Event e : strm) {
-				DBRTimeEvent dbrevent = (DBRTimeEvent) e;
-				double val = dbrevent.getSampleValue().getValue().doubleValue();
-				if(val < minValue) minValue = val;
-				if(val > 0 && val < minPosValue) minPosValue = val;
-				if(val > maxValue) maxValue = val;
-				long currenttsms = dbrevent.getEpochSeconds()*1000;
-				if(currenttsms < minTimeMs) minTimeMs = currenttsms;
-				if(currenttsms > maxTimeMs) maxTimeMs = currenttsms;
-				events.add(dbrevent);
-			}
-		} finally {
-			strm.close();
-		}
+	}
+	
+	public void add(DBRTimeEvent dbrevent) {
+		double val = dbrevent.getSampleValue().getValue().doubleValue();
+		if(val < minValue) minValue = val;
+		if(val > 0 && val < minPosValue) minPosValue = val;
+		if(val > maxValue) maxValue = val;
+		long currenttsms = dbrevent.getEpochSeconds()*1000;
+		if(currenttsms < minTimeMs) minTimeMs = currenttsms;
+		if(currenttsms > maxTimeMs) maxTimeMs = currenttsms;
+		events.add(dbrevent);
 	}
 
 	@Override
