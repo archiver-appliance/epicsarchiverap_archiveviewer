@@ -2,7 +2,7 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.util.logging.Logger;
 
-import org.epics.archiverappliance.retrieval.EventStreamDesc;
+import org.epics.archiverappliance.EventStreamDesc;
 import org.epics.archiverappliance.retrieval.client.RetrievalEventProcessor;
 
 import epics.archiveviewer.AVEntry;
