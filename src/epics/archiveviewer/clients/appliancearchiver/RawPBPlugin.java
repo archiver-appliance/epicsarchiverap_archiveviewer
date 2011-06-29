@@ -67,13 +67,15 @@ public class RawPBPlugin implements ClientPlugin {
 		// We are skipping the nanos when making the request to the server.
 		Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
 		Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
+		
+		boolean useReducedDataset = requestObject.getIncludeSparcified();
 
 		// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
 		RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
 
 		long before = System.currentTimeMillis();
 		RawRetrievalEventProcessor retrievalProcessor = new RawRetrievalEventProcessor(archiveEntries);
-		EventStream strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, retrievalProcessor);
+		EventStream strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, retrievalProcessor, useReducedDataset);
 		long totalValues = 0;
 		if(strm != null) {
 			try {
