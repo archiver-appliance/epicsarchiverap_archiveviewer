@@ -9,8 +9,10 @@ import java.util.logging.Logger;
 
 import org.epics.archiverappliance.Event;
 import org.epics.archiverappliance.EventStream;
+import org.epics.archiverappliance.EventStreamDesc;
 import org.epics.archiverappliance.data.DBRTimeEvent;
 import org.epics.archiverappliance.retrieval.client.RawDataRetrieval;
+import org.epics.archiverappliance.retrieval.client.RetrievalEventProcessor;
 
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.AVEntryInfo;
@@ -51,6 +53,35 @@ public class RawPBPlugin implements ClientPlugin {
 		logger.info(pingresponse);
 		
 		serverURL = urlStr;
+		
+		
+		// We ping this PV to make sure we have the right client libraries etc...
+		String archApplPingPV = "ArchApplPingPV";
+		String[] pvNamesArray = new String[] {  archApplPingPV };
+
+		Timestamp start = new Timestamp(System.currentTimeMillis()-1000);
+		Timestamp end = new Timestamp(System.currentTimeMillis());
+		boolean useReducedDataset = false;
+		RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
+		EventStream strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, new RetrievalEventProcessor() {
+			@Override
+			public void newPVOnStream(EventStreamDesc arg0) {
+			}
+		}, useReducedDataset);
+		long totalValues = 0;
+		if(strm != null) {
+			try {
+				for(Event e : strm) {
+					DBRTimeEvent dbrevent = (DBRTimeEvent) e;
+					long epochSeconds = e.getEpochSeconds();
+					totalValues++;
+				}
+			} finally {
+				strm.close();
+			}
+		} else {
+			logger.warning("We got an empty stream for the ping PV " + archApplPingPV);
+		}
 	}
 	
 	
