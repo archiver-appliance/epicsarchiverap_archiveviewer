@@ -2,7 +2,9 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.util.Vector;
 
+import org.epics.archiverappliance.EventStreamDesc;
 import org.epics.archiverappliance.data.DBRTimeEvent;
+import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
 
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.ValuesContainer;
@@ -22,9 +24,11 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	long minTimeMs = Long.MAX_VALUE;
 	long maxTimeMs = 0L;
 	
+	private RemotableEventStreamDesc remoteDesc;
 	
-	public EventStreamValuesContainer(AVEntry av) {
+	public EventStreamValuesContainer(AVEntry av, RemotableEventStreamDesc desc) {
 		this.avEntry = av;
+		this.remoteDesc = desc;
 	}
 	
 	public void add(DBRTimeEvent dbrevent) {
@@ -55,7 +59,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getUnits() throws Exception {
-		return "UnknownUnits";
+		return remoteDesc.getUnits();
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getDisplayLabel(int index) throws Exception {
-		return "DisplayLabel";
+		return remoteDesc.getPvName();
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public boolean isWaveform() {
-		return false;
+		return remoteDesc.getArchDBRType().isWaveForm();
 	}
 
 	@Override
@@ -108,7 +112,11 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public int getPrecision() {
-		return 10;
+		if(remoteDesc.getPrecision() != null) {
+			return (int) remoteDesc.getPrecision().doubleValue();
+		} else { 
+			return 0;
+		}
 	}
 
 	@Override

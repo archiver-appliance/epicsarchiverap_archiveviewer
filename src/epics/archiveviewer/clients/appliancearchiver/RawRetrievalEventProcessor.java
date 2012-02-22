@@ -3,6 +3,7 @@ package epics.archiveviewer.clients.appliancearchiver;
 import java.util.logging.Logger;
 
 import org.epics.archiverappliance.EventStreamDesc;
+import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
 import org.epics.archiverappliance.retrieval.client.RetrievalEventProcessor;
 
 import epics.archiveviewer.AVEntry;
@@ -23,7 +24,8 @@ public class RawRetrievalEventProcessor implements RetrievalEventProcessor {
 	@Override
 	public void newPVOnStream(EventStreamDesc desc) {
 		logger.info("Getting data for PV " + desc.getPvName());
-		currentVals = new EventStreamValuesContainer(avEntries[currentPV]);
+		assert(desc instanceof RemotableEventStreamDesc);
+		currentVals = new EventStreamValuesContainer(avEntries[currentPV], (RemotableEventStreamDesc) desc);
 		valueContainers[currentPV] = currentVals;
 		currentPV++;
 	}
