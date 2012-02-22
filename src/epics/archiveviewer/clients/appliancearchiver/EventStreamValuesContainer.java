@@ -1,5 +1,6 @@
 package epics.archiveviewer.clients.appliancearchiver;
 
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import org.epics.archiverappliance.EventStreamDesc;
@@ -20,6 +21,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	private double minValue = Double.MAX_VALUE;
 	private double maxValue = Double.MIN_VALUE;
 	private double minPosValue = Double.MAX_VALUE;
+	private DecimalFormat formatter = new DecimalFormat();
 	
 	long minTimeMs = Long.MAX_VALUE;
 	long maxTimeMs = 0L;
@@ -29,6 +31,9 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	public EventStreamValuesContainer(AVEntry av, RemotableEventStreamDesc desc) {
 		this.avEntry = av;
 		this.remoteDesc = desc;
+		if(desc.getPrecision() != null) {
+			formatter.setMaximumFractionDigits(desc.getPrecision().intValue());
+		}
 	}
 	
 	public void add(DBRTimeEvent dbrevent) {
@@ -64,7 +69,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public int getDimension() throws Exception {
-		return 1;
+		return remoteDesc.getElementCount();
 	}
 
 	@Override
@@ -79,7 +84,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getStatus(int index) {
-		return "Unknown Status";
+		return events.get(index).getSeverity() + "\t" + events.get(index).getStatus();
 	}
 
 	@Override
@@ -113,7 +118,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	@Override
 	public int getPrecision() {
 		if(remoteDesc.getPrecision() != null) {
-			return (int) remoteDesc.getPrecision().doubleValue();
+			return remoteDesc.getPrecision().intValue();
 		} else { 
 			return 0;
 		}
@@ -141,7 +146,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getRangeLabel(String separator) {
-		return String.valueOf(minValue) + ":" + String.valueOf(maxValue);
+		return formatter.format(minValue) + separator + formatter.format(maxValue);
 	}
 
 }
