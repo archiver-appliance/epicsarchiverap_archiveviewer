@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 
 import org.epics.archiverappliance.EventStreamDesc;
+import org.epics.archiverappliance.config.ArchDBRTypes;
 import org.epics.archiverappliance.data.DBRTimeEvent;
 import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
 
@@ -74,7 +75,16 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getDisplayLabel(int index) throws Exception {
-		return remoteDesc.getPvName();
+		if(remoteDesc.getArchDBRType().isWaveForm()) {
+			return "Waveform";
+		}
+	
+		if (this.isValid(index))
+		{
+			return valueToString(index, 0);
+		}
+
+		return computeSeverityLabel(events.get(index).getSeverity());
 	}
 
 	@Override
@@ -84,17 +94,17 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getStatus(int index) {
-		return events.get(index).getSeverity() + "\t" + events.get(index).getStatus();
+		return computeSeverityLabel(events.get(index).getSeverity()) + "\t" + events.get(index).getStatus();
 	}
 
 	@Override
 	public boolean isDiscrete() {
-		return false;
+		return remoteDesc.getArchDBRType() == ArchDBRTypes.DBR_SCALAR_ENUM;
 	}
 
 	@Override
 	public boolean isValid(int index) throws Exception {
-		return index < events.size();
+		return index < events.size() & events.get(index).getSeverity() != 3;
 	}
 
 	@Override
@@ -112,6 +122,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public Class getDataType() {
+		// TODO what should we return here?
 		return Double.class;
 	}
 
@@ -147,6 +158,26 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	@Override
 	public String getRangeLabel(String separator) {
 		return formatter.format(minValue) + separator + formatter.format(maxValue);
+	}
+	
+	private static String computeSeverityLabel(int severity) {
+		switch(severity) {
+		case 0:
+			return "NO ALARM";
+		case 1:
+			return "MINOR";
+		case 2: 
+			return "MAJOR";
+		case 3:
+			return "INVALID";
+//		3968 Est Repeat true false
+//		3856 Repeat true false
+//		3904 Disconnected false true
+//		3872 Archive Off false true
+//		3848 Archive Disabled false true
+		default:
+			return "UnknownSeverity";
+		}
 	}
 
 }
