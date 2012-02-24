@@ -34,6 +34,7 @@ import epics.archiveviewer.clients.channelarchiver.RetrievalMethodImpl;
 
 public class RawPBPlugin implements ClientPlugin {
 	private static Logger logger = Logger.getLogger(RawPBPlugin.class.getName());
+	private String originalURL = null;
 	private String serverURL = null;
 	private RetrievalMethod[] retrievalMethodsForPlot = {
 			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true)
@@ -46,8 +47,10 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public void connect(String urlStr, ProgressTask progressInfo) throws Exception {
-		logger.info("Connect called");
-		URL url = new URL(urlStr + "/ping");
+		logger.info("Connect called " + urlStr);
+		originalURL = urlStr;
+		serverURL = urlStr.replace("pbraw://", "http://");
+		URL url = new URL(serverURL + "/ping");
 		InputStream is = url.openStream();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		byte[] buf = new byte[1024];
@@ -60,7 +63,6 @@ public class RawPBPlugin implements ClientPlugin {
 		String pingresponse = bos.toString();
 		logger.info(pingresponse);
 		
-		serverURL = urlStr;
 		
 		
 		// We ping this PV to make sure we have the right client libraries etc...
@@ -191,15 +193,24 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public String getConnectionParameter() {
-		logger.info("getConnectionParameter called");
-		// TODO Auto-generated method stub
-		return null;
+		return originalURL;
 	}
 
 	@Override
 	public void reconnect(ProgressTask progressInfo) throws Exception {
 		logger.info("reconnect called");
-		// TODO Auto-generated method stub
+		URL url = new URL(serverURL + "/ping");
+		InputStream is = url.openStream();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		byte[] buf = new byte[1024];
+		int bytesRead = is.read(buf);
+		while(bytesRead > 0) {
+			bos.write(buf, 0, bytesRead);
+			bytesRead = is.read(buf);
+		}
+		is.close();
+		String pingresponse = bos.toString();
+		logger.info(pingresponse);
 	}
 
 	@Override
