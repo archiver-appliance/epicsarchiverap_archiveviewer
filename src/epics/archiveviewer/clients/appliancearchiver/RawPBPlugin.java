@@ -154,6 +154,7 @@ public class RawPBPlugin implements ClientPlugin {
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
 
 
+				long before = System.currentTimeMillis();
 				// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
 				RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
 				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, new RetrievalEventProcessor() {
@@ -162,7 +163,6 @@ public class RawPBPlugin implements ClientPlugin {
 					}
 				}, useReducedDataset);
 
-				long before = System.currentTimeMillis();
 
 				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, (RemotableEventStreamDesc) strm.getDescription());
 				valueContainers[resultIndex] = currentVals;
@@ -180,7 +180,7 @@ public class RawPBPlugin implements ClientPlugin {
 					}
 
 					long after = System.currentTimeMillis();
-					logger.info("Retrieved " + totalValues	+ " values in " + (after-before) + "(ms)");
+					logger.info("Retrieved " + totalValues	+ " values  for pv " + pvName + " in " + (after-before) + "(ms)");
 				}
 
 			} catch(Throwable t) {
