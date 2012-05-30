@@ -237,9 +237,7 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public RetrievalMethod[] getRetrievalMethodsForExport() {
-		logger.info("getRetrievalMethodsForExport called");
-		// TODO Auto-generated method stub
-		return null;
+		return retrievalMethodsForPlot;
 	}
 
 	@Override
@@ -249,15 +247,16 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public RetrievalMethod[] getRetrievalMethodsForCalculation() {
-		logger.info("getRetrievalMethod called");
-		// TODO Auto-generated method stub
-		return null;
+		return retrievalMethodsForPlot;
 	}
 
 	@Override
 	public RetrievalMethod getRetrievalMethod(String methodName) {
-		logger.info("getRetrievalMethod called");
-		// TODO Auto-generated method stub
+		logger.info("getRetrievalMethod called for method " + methodName);
+		for(RetrievalMethod retrievalMethod : retrievalMethodsForPlot) {
+			if(retrievalMethod.getName().equals(methodName)) return retrievalMethod;
+		}
+		logger.warning("Cannot find retrieval method for method name " + methodName);
 		return null;
 	}
 
