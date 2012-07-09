@@ -132,6 +132,7 @@ public class RawPBPlugin implements ClientPlugin {
 		ValuesContainer[] valueContainers;
 		int resultIndex;
 		RequestObject requestObject;
+		int requestedNumberOfValues;
 		
 		public FetchDataFromAppliance(String pvName, AVEntry avEntry, ValuesContainer[] valueContainers, int resultIndex, RequestObject requestObject) {
 			this.pvName = pvName;
@@ -139,6 +140,7 @@ public class RawPBPlugin implements ClientPlugin {
 			this.valueContainers = valueContainers;
 			this.resultIndex = resultIndex;
 			this.requestObject = requestObject;
+			this.requestedNumberOfValues = requestObject.getRequestedNrOfValues();
 			System.out.println("After creating callable....");
 		}
 
@@ -157,7 +159,7 @@ public class RawPBPlugin implements ClientPlugin {
 				long before = System.currentTimeMillis();
 				// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
 				RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
-				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, new RetrievalEventProcessor() {
+				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, requestedNumberOfValues, new RetrievalEventProcessor() {
 					@Override
 					public void newPVOnStream(EventStreamDesc arg0) {
 					}
