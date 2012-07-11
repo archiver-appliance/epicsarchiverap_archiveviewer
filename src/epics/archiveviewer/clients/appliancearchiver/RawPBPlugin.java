@@ -5,12 +5,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -133,6 +131,7 @@ public class RawPBPlugin implements ClientPlugin {
 		int resultIndex;
 		RequestObject requestObject;
 		int requestedNumberOfValues;
+		String requestedMethodKey;
 		
 		public FetchDataFromAppliance(String pvName, AVEntry avEntry, ValuesContainer[] valueContainers, int resultIndex, RequestObject requestObject) {
 			this.pvName = pvName;
@@ -141,6 +140,7 @@ public class RawPBPlugin implements ClientPlugin {
 			this.resultIndex = resultIndex;
 			this.requestObject = requestObject;
 			this.requestedNumberOfValues = requestObject.getRequestedNrOfValues();
+			this.requestedMethodKey = requestObject.getMethod().getKey().toString();
 			System.out.println("After creating callable....");
 		}
 
@@ -159,11 +159,14 @@ public class RawPBPlugin implements ClientPlugin {
 				long before = System.currentTimeMillis();
 				// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
 				RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
-				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, requestedNumberOfValues, new RetrievalEventProcessor() {
+				HashMap<String, String> extraParams = new HashMap<String,String>();
+				extraParams.put("ca_count", Integer.toString(requestedNumberOfValues));
+				extraParams.put("ca_how", requestedMethodKey);
+				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, new RetrievalEventProcessor() {
 					@Override
 					public void newPVOnStream(EventStreamDesc arg0) {
 					}
-				}, useReducedDataset);
+				}, useReducedDataset, extraParams);
 
 
 				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, (RemotableEventStreamDesc) strm.getDescription());
