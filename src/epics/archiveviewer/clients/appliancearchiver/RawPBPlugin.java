@@ -2,10 +2,15 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -280,11 +285,27 @@ public class RawPBPlugin implements ClientPlugin {
 	}
 
 	@Override
-	public AVEntry[] search(ArchiveDirectory ad, String pattern,
-			ProgressTask progressInfo) throws Exception {
-		logger.info("search called");
-		// TODO Auto-generated method stub
-		return null;
+	public AVEntry[] search(ArchiveDirectory ad, String pattern, ProgressTask progressInfo) throws Exception {
+		logger.info("search called for pattern " + pattern);
+		String searchURL = serverURL + "/bpl/searchForPVsRegex?regex=" + URLEncoder.encode(pattern, "UTF-8");
+		URL url = new URL(searchURL);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.connect();
+		if(connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+			LinkedList<AVEntry> ret = new LinkedList<AVEntry>();
+			try(InputStream is = connection.getInputStream(); LineNumberReader reader = new LineNumberReader(new InputStreamReader(is))) {
+				String pvName = reader.readLine();
+				while(pvName != null) {
+					AVEntry entry = new AVEntry(pvName, ad);
+					ret.add(entry);
+					pvName = reader.readLine();
+				}
+			}
+			return ret.toArray(new AVEntry[0]);
+		} else {
+			logger.warning("Invalid HTTP response from server " + connection.getResponseCode());
+			return new AVEntry[0]; 
+		}
 	}
 
 	@Override
