@@ -206,6 +206,7 @@ public class PlotPluginWrappersTabbedPaneController {
 				}
 				catch(Exception ex)
 				{
+					ex.printStackTrace();
 					avController.getAVBase().displayError("Can't load plot plugin " + ppClassNamesToLoad[i], ex);
 				}
 			}

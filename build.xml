@@ -30,6 +30,27 @@
     	       	</fileset>
     	    </classpath>
     	</javac>
+		<copy todir="${classes}/epics/archiveviewer/xal/resources">
+			<fileset dir="src/epics/archiveviewer/xal/resources">
+    	          <include name="*"/>
+			</fileset>
+		</copy>
+		<copy todir="${classes}/org/jfree/chart">
+			<fileset dir="src/org/jfree/chart">
+    	          <include name="*.properties"/>
+			</fileset>
+		</copy>
+		<copy todir="${classes}/org/jfree/chart/ui">
+			<fileset dir="src/org/jfree/chart/ui">
+    	          <include name="*.properties"/>
+			</fileset>
+		</copy>
+		<copy todir="${classes}/org/jfree/chart/plot">
+			<fileset dir="src/org/jfree/chart/plot">
+    	          <include name="*.properties"/>
+			</fileset>
+		</copy>
+		
     </target>
 
 	<target name="clean">
