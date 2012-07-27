@@ -20,10 +20,12 @@ import java.util.logging.Logger;
 import org.epics.archiverappliance.Event;
 import org.epics.archiverappliance.EventStream;
 import org.epics.archiverappliance.EventStreamDesc;
+import org.epics.archiverappliance.config.ArchDBRTypes;
 import org.epics.archiverappliance.data.DBRTimeEvent;
 import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
 import org.epics.archiverappliance.retrieval.client.RawDataRetrieval;
 import org.epics.archiverappliance.retrieval.client.RetrievalEventProcessor;
+import org.epics.archiverappliance.utils.TimeUtils;
 
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.AVEntryInfo;
@@ -173,8 +175,7 @@ public class RawPBPlugin implements ClientPlugin {
 					}
 				}, useReducedDataset, extraParams);
 
-
-				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, (RemotableEventStreamDesc) strm.getDescription());
+				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, (strm == null ? new RemotableEventStreamDesc(ArchDBRTypes.DBR_SCALAR_DOUBLE, pvName, TimeUtils.getCurrentYear()) : (RemotableEventStreamDesc) strm.getDescription()));
 				valueContainers[resultIndex] = currentVals;
 
 				long totalValues = 0;

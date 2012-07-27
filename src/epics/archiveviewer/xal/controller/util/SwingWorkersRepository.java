@@ -6,7 +6,9 @@
  */
 package epics.archiveviewer.xal.controller.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintWriter;
 
 import epics.archiveviewer.PlotPlugin;
 import epics.archiveviewer.ValuesContainer;
@@ -154,7 +156,11 @@ public class SwingWorkersRepository {
 				}
 				catch(Exception e)
 				{
-					avBase.displayError("Can't plot", e);
+					ByteArrayOutputStream bos = new ByteArrayOutputStream();
+					PrintWriter out = new PrintWriter(bos);
+					e.printStackTrace(out);
+					out.close();
+					avBase.displayError("Can't plot\n" + bos.toString(), e);
 				}
 				return null;
 			}
