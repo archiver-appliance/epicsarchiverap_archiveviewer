@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Apr 11, 2011 3:57:12 PM                                                        
+
+     epicsarchiverap    
+     The EPICS archiver appliance 
+                   
+     mshankar                                                                
+     ====================================================================== -->
+<project name="ArchiveViewer" default="compile">
+    <description>The build file for the ArchiveViewer.</description>
+	
+	<property environment="env"/>
+	<property name="ver" value="0.0.1"/>
+	<property name="src" location="src"/>
+	<property name="classes" location="bin/"/>
+	<property name="lib" location="ext_jars/"/>
+
+	<target name="compile" depends="clean">
+    	<mkdir dir="${classes}"/>
+    	<javac destdir="${classes}" includeantruntime="false" debug="true">
+    		<src path="${src}"/>
+    	    <classpath>
+    	    	<pathelement path="${classes}"/>
+    	        <fileset dir="${lib}">
+    	          <include name="**/*.jar"/>
+    	        </fileset>
+    	    </classpath>
+    	</javac>
+    </target>
+
+	<target name="clean">
+    	<delete dir="${classes}"/>
+    </target>
+
+</project>
