@@ -302,8 +302,7 @@ public class RawPBPlugin implements ClientPlugin {
 	@Override
 	public int getMaxNrValuesPerPVPerRequest(int nrPVs) {
 		logger.info("getMaxNrValuesPerPVPerRequest called");
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
