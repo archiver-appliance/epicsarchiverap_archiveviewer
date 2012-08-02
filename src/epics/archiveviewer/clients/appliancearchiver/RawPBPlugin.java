@@ -42,7 +42,8 @@ public class RawPBPlugin implements ClientPlugin {
 	private String originalURL = null;
 	private String serverURL = null;
 	private RetrievalMethod[] retrievalMethodsForPlot = {
-			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true)
+			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true),
+			new RetrievalMethodImpl(new Integer(2), "average", "Use the mean postprocessor", false, true)
 			};  
 	
 	@Override
@@ -110,23 +111,28 @@ public class RawPBPlugin implements ClientPlugin {
 		}
 		
 		int totalPVs = archiveEntries.length;
-		ValuesContainer[] valueContainers = new ValuesContainer[totalPVs];
+		EventStreamValuesContainer[] valueContainers = new EventStreamValuesContainer[totalPVs];
 
 		ExecutorService executor = Executors.newCachedThreadPool();
 
-		ArrayList<Callable<String>> callables = new ArrayList<Callable<String>>();
-		int pvIndex = 0;
-		for(String pvName : pvNames) {
-			callables.add(new FetchDataFromAppliance(pvName, archiveEntries[pvIndex], valueContainers, pvIndex, requestObject));
-			pvIndex++;
+		try { 
+			ArrayList<Callable<String>> callables = new ArrayList<Callable<String>>();
+			int pvIndex = 0;
+			for(String pvName : pvNames) {
+				callables.add(new FetchDataFromAppliance(pvName, archiveEntries[pvIndex], valueContainers, pvIndex, requestObject));
+				pvIndex++;
+			}
+
+			long before = System.currentTimeMillis();
+			executor.invokeAll(callables);
+			long after = System.currentTimeMillis();
+			logger.info("Retrieved data for " + totalPVs + " pvs in " + (after-before) + "(ms)");
+			
+		} finally { 
+			executor.shutdown();
 		}
 		
-		long before = System.currentTimeMillis();
-		executor.invokeAll(callables);
-		long after = System.currentTimeMillis();
-		logger.info("Retrieved data for " + totalPVs + " pvs in " + (after-before) + "(ms)");
 		
-		executor.shutdown();
 		return valueContainers;
 
 	}
@@ -147,7 +153,12 @@ public class RawPBPlugin implements ClientPlugin {
 			this.resultIndex = resultIndex;
 			this.requestObject = requestObject;
 			this.requestedNumberOfValues = requestObject.getRequestedNrOfValues();
-			this.requestedMethodKey = requestObject.getMethod().getKey().toString();
+			if(requestObject.getMethod() != null && requestObject.getMethod().getKey() != null) {
+				this.requestedMethodKey = requestObject.getMethod().getKey().toString();
+			} else { 
+				logger.info("Defaulting to raw request method");
+				this.requestedMethodKey = "0";
+			}
 			System.out.println("After creating callable....");
 		}
 
@@ -161,6 +172,13 @@ public class RawPBPlugin implements ClientPlugin {
 				// We are skipping the nanos when making the request to the server.
 				Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
+				
+				String postProcessor = null;
+				if(requestedMethodKey != null && requestedMethodKey.equals("2")) {
+					logger.fine("Using the average postprocessor");
+					int binSize = (int) (end.getTime() - start.getTime())/(1000*requestedNumberOfValues);
+					postProcessor = "mean_" + binSize + "_fill";
+				}
 
 
 				long before = System.currentTimeMillis();
@@ -169,6 +187,9 @@ public class RawPBPlugin implements ClientPlugin {
 				HashMap<String, String> extraParams = new HashMap<String,String>();
 				extraParams.put("ca_count", Integer.toString(requestedNumberOfValues));
 				extraParams.put("ca_how", requestedMethodKey);
+				if(postProcessor != null) {
+					extraParams.put("pp", postProcessor);					
+				}
 				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, new RetrievalEventProcessor() {
 					@Override
 					public void newPVOnStream(EventStreamDesc arg0) {
@@ -235,12 +256,12 @@ public class RawPBPlugin implements ClientPlugin {
 			
 			@Override
 			public String getName() {
-				return "Default directory";
+				return "Default";
 			}
 			
 			@Override
 			public Object getIDKey() {
-				return "Default directory";
+				return "Default";
 			}
 		};
 		return directories;
