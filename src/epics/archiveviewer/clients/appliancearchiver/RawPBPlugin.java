@@ -295,7 +295,6 @@ public class RawPBPlugin implements ClientPlugin {
 	@Override
 	public String getServerInfoText() throws Exception {
 		logger.info("getServerInfoText called");
-		// TODO Auto-generated method stub
 		return null;
 	}
 
