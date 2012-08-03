@@ -39,12 +39,15 @@ import epics.archiveviewer.clients.channelarchiver.RetrievalMethodImpl;
 
 public class RawPBPlugin implements ClientPlugin {
 	private static Logger logger = Logger.getLogger(RawPBPlugin.class.getName());
+	private static RetrievalMethodImpl[] retrievalMethodsForPlot = {
+			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true),
+			new RetrievalMethodImpl(new Integer(2), "average", "Use the mean postprocessor", false, true),
+			new RetrievalMethodImpl(new Integer(4), "linear", "Use the binned linear postprocessor", false, true),
+			new RetrievalMethodImpl(new Integer(5), "loess", "Use the binned loess postprocessor", false, true)
+			};
+
 	private String originalURL = null;
 	private String serverURL = null;
-	private RetrievalMethod[] retrievalMethodsForPlot = {
-			new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, true),
-			new RetrievalMethodImpl(new Integer(2), "average", "Use the mean postprocessor", false, true)
-			};  
 	
 	@Override
 	public String getName() {
@@ -174,10 +177,18 @@ public class RawPBPlugin implements ClientPlugin {
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
 				
 				String postProcessor = null;
-				if(requestedMethodKey != null && requestedMethodKey.equals("2")) {
-					logger.fine("Using the average postprocessor");
+				if(requestedMethodKey != null) { 
 					int binSize = (int) (end.getTime() - start.getTime())/(1000*requestedNumberOfValues);
-					postProcessor = "mean_" + binSize + "_fill";
+					if (requestedMethodKey.equals("2")) {
+						logger.fine("Using the average postprocessor");
+						postProcessor = "mean_" + binSize;
+					} else if(requestedMethodKey.equals("4")) {
+						logger.fine("Using the linear postprocessor");
+						postProcessor = "linear_" + binSize;
+					} else if(requestedMethodKey.equals("5")) {
+						logger.fine("Using the loess postprocessor");
+						postProcessor = "loess_" + binSize;
+					}
 				}
 
 
