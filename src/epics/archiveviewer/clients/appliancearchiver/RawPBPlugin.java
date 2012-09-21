@@ -74,13 +74,12 @@ public class RawPBPlugin implements ClientPlugin {
 
 			// We ping this PV to make sure we have the right client libraries etc...
 			String archApplPingPV = "ArchApplPingPV";
-			String[] pvNamesArray = new String[] {  archApplPingPV };
 
 			Timestamp start = new Timestamp(System.currentTimeMillis()-1000);
 			Timestamp end = new Timestamp(System.currentTimeMillis());
 			boolean useReducedDataset = false;
 			RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
-			GenMsgIterator strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, useReducedDataset);
+			GenMsgIterator strm = rawDataRetrieval.getDataForPV(archApplPingPV, start, end, useReducedDataset);
 			long totalValues = 0;
 			if(strm != null) {
 				try {
@@ -198,7 +197,7 @@ public class RawPBPlugin implements ClientPlugin {
 				if(postProcessor != null) {
 					extraParams.put("pp", postProcessor);					
 				}
-				GenMsgIterator strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, useReducedDataset, extraParams);
+				GenMsgIterator strm = rawDataRetrieval.getDataForPV(pvName, start, end, useReducedDataset, extraParams);
 
 				PayloadInfo info = null;
 				if(strm != null) { 
