@@ -11,9 +11,6 @@ export CLASSPATH=${CLASSPATH}:ext_jars/xal.jar
 export CLASSPATH=${CLASSPATH}:ext_jars/xmlrpc-1.1.jar
 export CLASSPATH=${CLASSPATH}:ext_jars/pbrawclient-0.0.1.jar
 export CLASSPATH=${CLASSPATH}:ext_jars/protobuf-java-2.4.1.jar
-export CLASSPATH=${CLASSPATH}:ext_jars/joda-time-2.0.jar
-export CLASSPATH=${CLASSPATH}:ext_jars/log4j-1.2.16.jar
-export CLASSPATH=${CLASSPATH}:ext_jars/jca-2.3.3.jar
 
 echo "Classpath is ${CLASSPATH}"
 

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
@@ -17,16 +18,12 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.epics.archiverappliance.Event;
-import org.epics.archiverappliance.EventStream;
-import org.epics.archiverappliance.EventStreamDesc;
-import org.epics.archiverappliance.config.ArchDBRTypes;
-import org.epics.archiverappliance.data.DBRTimeEvent;
-import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
+import org.epics.archiverappliance.retrieval.client.EpicsMessage;
+import org.epics.archiverappliance.retrieval.client.GenMsgIterator;
 import org.epics.archiverappliance.retrieval.client.RawDataRetrieval;
-import org.epics.archiverappliance.retrieval.client.RetrievalEventProcessor;
-import org.epics.archiverappliance.utils.TimeUtils;
 
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadInfo;
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadType;
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.AVEntryInfo;
 import epics.archiveviewer.ArchiveDirectory;
@@ -56,50 +53,50 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public void connect(String urlStr, ProgressTask progressInfo) throws Exception {
-		logger.info("Connect called " + urlStr);
-		originalURL = urlStr;
-		serverURL = urlStr.replace("pbraw://", "http://");
-		URL url = new URL(serverURL + "/ping");
-		InputStream is = url.openStream();
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		byte[] buf = new byte[1024];
-		int bytesRead = is.read(buf);
-		while(bytesRead > 0) {
-			bos.write(buf, 0, bytesRead);
-			bytesRead = is.read(buf);
-		}
-		is.close();
-		String pingresponse = bos.toString();
-		logger.info(pingresponse);
-		
-		
-		
-		// We ping this PV to make sure we have the right client libraries etc...
-		String archApplPingPV = "ArchApplPingPV";
-		String[] pvNamesArray = new String[] {  archApplPingPV };
+		try { 
+			logger.info("Connect called " + urlStr);
+			originalURL = urlStr;
+			serverURL = urlStr.replace("pbraw://", "http://");
+			URL url = new URL(serverURL + "/ping");
+			InputStream is = url.openStream();
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			byte[] buf = new byte[1024];
+			int bytesRead = is.read(buf);
+			while(bytesRead > 0) {
+				bos.write(buf, 0, bytesRead);
+				bytesRead = is.read(buf);
+			}
+			is.close();
+			String pingresponse = bos.toString();
+			logger.info(pingresponse);
 
-		Timestamp start = new Timestamp(System.currentTimeMillis()-1000);
-		Timestamp end = new Timestamp(System.currentTimeMillis());
-		boolean useReducedDataset = false;
-		RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
-		EventStream strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, new RetrievalEventProcessor() {
-			@Override
-			public void newPVOnStream(EventStreamDesc arg0) {
-			}
-		}, useReducedDataset);
-		long totalValues = 0;
-		if(strm != null) {
-			try {
-				for(Event e : strm) {
-					DBRTimeEvent dbrevent = (DBRTimeEvent) e;
-					long epochSeconds = e.getEpochSeconds();
-					totalValues++;
+
+
+			// We ping this PV to make sure we have the right client libraries etc...
+			String archApplPingPV = "ArchApplPingPV";
+			String[] pvNamesArray = new String[] {  archApplPingPV };
+
+			Timestamp start = new Timestamp(System.currentTimeMillis()-1000);
+			Timestamp end = new Timestamp(System.currentTimeMillis());
+			boolean useReducedDataset = false;
+			RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
+			GenMsgIterator strm = rawDataRetrieval.getDataForPVS(pvNamesArray, start, end, useReducedDataset);
+			long totalValues = 0;
+			if(strm != null) {
+				try {
+					for(EpicsMessage dbrevent : strm) {
+						long epochSeconds = dbrevent.getTimestamp().getTime()/1000;
+						totalValues++;
+					}
+				} finally {
+					strm.close();
 				}
-			} finally {
-				strm.close();
+			} else {
+				logger.warning("We got an empty stream for the ping PV " + archApplPingPV);
 			}
-		} else {
-			logger.warning("We got an empty stream for the ping PV " + archApplPingPV);
+		} catch(Exception ex) { 
+			logger.log(Level.SEVERE, "Exception establishing connection with the server", ex);
+			throw ex;
 		}
 	}
 	
@@ -201,20 +198,26 @@ public class RawPBPlugin implements ClientPlugin {
 				if(postProcessor != null) {
 					extraParams.put("pp", postProcessor);					
 				}
-				EventStream strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, new RetrievalEventProcessor() {
-					@Override
-					public void newPVOnStream(EventStreamDesc arg0) {
-					}
-				}, useReducedDataset, extraParams);
+				GenMsgIterator strm = rawDataRetrieval.getDataForPVS(new String[] { pvName }, start, end, useReducedDataset, extraParams);
 
-				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, (strm == null ? new RemotableEventStreamDesc(ArchDBRTypes.DBR_SCALAR_DOUBLE, pvName, TimeUtils.getCurrentYear()) : (RemotableEventStreamDesc) strm.getDescription()));
+				PayloadInfo info = null;
+				if(strm != null) { 
+					info =  strm.getPayLoadInfo();
+				} else { 
+					Calendar startCal = Calendar.getInstance();
+					startCal.setTime(start);
+					info = PayloadInfo.newBuilder()
+					.setPvname(pvName)
+					.setType(PayloadType.SCALAR_DOUBLE)
+					.setYear(startCal.get(Calendar.YEAR)).build();
+				}
+				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, info);
 				valueContainers[resultIndex] = currentVals;
 
 				long totalValues = 0;
 				if(strm != null) {
 					try {
-						for(Event e : strm) {
-							DBRTimeEvent dbrevent = (DBRTimeEvent) e;
+						for(EpicsMessage dbrevent : strm) {
 							currentVals.add(dbrevent);
 							totalValues++;
 						}

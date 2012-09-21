@@ -1,13 +1,13 @@
 package epics.archiveviewer.clients.appliancearchiver;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Vector;
 
-import org.epics.archiverappliance.EventStreamDesc;
-import org.epics.archiverappliance.config.ArchDBRTypes;
-import org.epics.archiverappliance.data.DBRTimeEvent;
-import org.epics.archiverappliance.retrieval.RemotableEventStreamDesc;
+import org.epics.archiverappliance.retrieval.client.EpicsMessage;
 
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent;
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadType;
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.ValuesContainer;
 
@@ -18,7 +18,7 @@ import epics.archiveviewer.ValuesContainer;
  */
 public class EventStreamValuesContainer implements ValuesContainer {
 	private AVEntry avEntry;
-	private Vector<DBRTimeEvent> events = new Vector<DBRTimeEvent>();
+	private Vector<EpicsMessage> events = new Vector<EpicsMessage>();
 	private double minValue = Double.MAX_VALUE;
 	private double maxValue = Double.MIN_VALUE;
 	private double minPosValue = Double.MAX_VALUE;
@@ -27,22 +27,22 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	long minTimeMs = Long.MAX_VALUE;
 	long maxTimeMs = 0L;
 	
-	private RemotableEventStreamDesc remoteDesc;
+	private EPICSEvent.PayloadInfo payloadInfo;
 	
-	public EventStreamValuesContainer(AVEntry av, RemotableEventStreamDesc desc) {
+	public EventStreamValuesContainer(AVEntry av, EPICSEvent.PayloadInfo desc) {
 		this.avEntry = av;
-		this.remoteDesc = desc;
-		if(desc.getPrecision() != null) {
-			formatter.setMaximumFractionDigits(desc.getPrecision().intValue());
+		this.payloadInfo = desc;
+		if(desc.hasPrecision()) {
+			formatter.setMaximumFractionDigits(new Double(desc.getPrecision()).intValue());
 		}
 	}
 	
-	public void add(DBRTimeEvent dbrevent) {
-		double val = dbrevent.getSampleValue().getValue().doubleValue();
+	public void add(EpicsMessage dbrevent) throws IOException {
+		double val = dbrevent.getNumberValue().doubleValue();
 		if(val < minValue) minValue = val;
 		if(val > 0 && val < minPosValue) minPosValue = val;
 		if(val > maxValue) maxValue = val;
-		long currenttsms = dbrevent.getEpochSeconds()*1000;
+		long currenttsms = dbrevent.getTimestamp().getTime();
 		if(currenttsms < minTimeMs) minTimeMs = currenttsms;
 		if(currenttsms > maxTimeMs) maxTimeMs = currenttsms;
 		events.add(dbrevent);
@@ -60,22 +60,22 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public double getTimestampInMsec(int index) throws Exception {
-		return events.get(index).getEpochSeconds()*1000;
+		return events.get(index).getTimestamp().getTime();
 	}
 
 	@Override
 	public String getUnits() throws Exception {
-		return remoteDesc.getUnits();
+		return payloadInfo.getUnits();
 	}
 
 	@Override
 	public int getDimension() throws Exception {
-		return remoteDesc.getElementCount();
+		return payloadInfo.getElementCount();
 	}
 
 	@Override
 	public String getDisplayLabel(int index) throws Exception {
-		if(remoteDesc.getArchDBRType().isWaveForm()) {
+		if(payloadInfo.getType().getNumber() >= 7) {
 			return "Waveform";
 		}
 	
@@ -89,7 +89,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String valueToString(int index, int item) throws Exception {
-		return events.get(index).getSampleValue().toString();
+		return events.get(index).getNumberValue().toString();
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public boolean isDiscrete() {
-		return remoteDesc.getArchDBRType() == ArchDBRTypes.DBR_SCALAR_ENUM;
+		return payloadInfo.getType() == PayloadType.SCALAR_ENUM;
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public Vector getValue(int index) throws Exception {
-		Number val = events.get(index).getSampleValue().getValue(index);
+		Number val = events.get(index).getNumberAt(index);
 		Vector<Number> ret = new Vector<Number>();
 		ret.add(val);
 		return ret;
@@ -117,7 +117,7 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public boolean isWaveform() {
-		return remoteDesc.getArchDBRType().isWaveForm();
+		return payloadInfo.getType().getNumber() >= 7;
 	}
 
 	@Override
@@ -128,8 +128,8 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public int getPrecision() {
-		if(remoteDesc.getPrecision() != null) {
-			return remoteDesc.getPrecision().intValue();
+		if(payloadInfo.hasPrecision()) {
+			return new Double(payloadInfo.getPrecision()).intValue();
 		} else { 
 			return 0;
 		}
