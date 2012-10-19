@@ -29,7 +29,7 @@
  * Original Author:  Richard Atkinson;
  * Contributor(s):   -;
  *
- * $Id: SunJPEGEncoderAdapter.java,v 1.1.1.1 2007/01/29 22:46:46 rdh Exp $
+ * $Id: SunJPEGEncoderAdapter.java,v 1.3 2012/07/31 18:27:18 partha Exp $
  *
  * Changes
  * -------
@@ -39,14 +39,18 @@
 
 package org.jfree.chart.encoders;
 
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
+import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
 
 /**
  * Adapter class for the Sun JPEG Encoder.
@@ -118,13 +122,28 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
      * @param outputStream  The OutputStream to write the encoded image to.
      * @throws IOException
      */
-    public void encode(BufferedImage bufferedImage, OutputStream outputStream) throws IOException {
-        if (bufferedImage == null) throw new IllegalArgumentException("Null 'image' argument.");
-        if (outputStream == null) throw new IllegalArgumentException("Null 'outputStream' argument.");
-        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(outputStream);
-        JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(bufferedImage);
-        param.setQuality(this.quality, true);
-        encoder.encode(bufferedImage, param);
-    }
+	public void encode(BufferedImage bufferedImage, OutputStream outputStream)
+			throws IOException {
+		if (bufferedImage == null)
+			throw new IllegalArgumentException("Null 'image' argument.");
+		if (outputStream == null)
+			throw new IllegalArgumentException("Null 'outputStream' argument.");
+
+		JPEGImageWriter imageWriter = (JPEGImageWriter) ImageIO
+				.getImageWritersBySuffix("jpeg").next();
+		ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream);
+		imageWriter.setOutput(ios);
+		IIOMetadata imageMetaData = imageWriter.getDefaultImageMetadata(
+				new ImageTypeSpecifier(bufferedImage), null);
+
+		JPEGImageWriteParam jpegParams = (JPEGImageWriteParam) imageWriter
+				.getDefaultWriteParam();
+		jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
+		jpegParams.setCompressionQuality(quality);
+		imageWriter.write(imageMetaData,
+				new IIOImage(bufferedImage, null, null), null);
+		outputStream.close();
+		imageWriter.dispose();
+	}
 
 }
