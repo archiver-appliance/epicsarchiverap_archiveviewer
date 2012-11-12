@@ -15,6 +15,7 @@ export CLASSPATH=${CLASSPATH}:ext_jars/protobuf-java-2.4.1.jar
 echo "Classpath is ${CLASSPATH}"
 
 java \
+-Xmx512M -Xms512M \
 -Dsun.java2d.pmoffscreen=false \
 -Dsun.java2d.print.polling=false \
 -Dlog4j.configuration=log4j.properties \
