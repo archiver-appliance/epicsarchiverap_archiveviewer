@@ -2,6 +2,7 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import org.epics.archiverappliance.retrieval.client.EpicsMessage;
@@ -35,6 +36,23 @@ public class EventStreamValuesContainer implements ValuesContainer {
 		if(desc.hasPrecision()) {
 			formatter.setMaximumFractionDigits(new Double(desc.getPrecision()).intValue());
 		}
+		
+		LinkedHashMap<String, Object> m = new LinkedHashMap<String, Object>(8);
+		if (desc.getElementCount() > 1)
+			m.put("type", "waveform");
+		else
+			m.put("type", "double");
+
+		m.put("disp_low", new Double(desc.getLowerDisplayLimit()));
+		m.put("disp_high", new Double(desc.getUpperDisplayLimit()));
+		m.put("alarm_low", new Double(desc.getLowerAlarmLimit()));
+		m.put("alarm_high", new Double(desc.getUpperAlarmLimit()));
+		m.put("warn_low", new Double(desc.getLowerWarningLimit()));
+		m.put("warn_high", new Double(desc.getUpperWarningLimit()));
+		m.put("precision", new Integer((int) desc.getPrecision()));
+		m.put("units", desc.getUnits());
+		av.setMetaData(m);
+
 	}
 	
 	public void add(EpicsMessage dbrevent) throws IOException {
