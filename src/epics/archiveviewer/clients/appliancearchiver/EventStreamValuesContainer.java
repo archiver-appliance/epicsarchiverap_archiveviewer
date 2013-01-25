@@ -209,10 +209,33 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 		else
 			m.put("type", "double");
 
-		if(desc.getHeadersCount() > 0 ) { 
+		if(desc.getHeadersCount() > 0 ) {
 			for(FieldValue f : desc.getHeadersList()) { 
-				m.put(f.getName(), f.getVal());
+				m.put(mapFieldName(f.getName()), f.getVal());
 			}
 		}
+	}
+	
+	private static HashMap<String, String> fieldNameMappings = new HashMap<String, String>();
+	static { 
+		fieldNameMappings.put("LOPR", "disp_low");
+		fieldNameMappings.put("HOPR", "disp_high");
+		fieldNameMappings.put("LOLO", "alarm_low");
+		fieldNameMappings.put("HIHI", "alarm_high");
+		fieldNameMappings.put("LOW", "warn_low");
+		fieldNameMappings.put("HIGH", "warn_high");
+		fieldNameMappings.put("PREC", "precision");
+		fieldNameMappings.put("EGU", "units");
+		fieldNameMappings.put("DESC", "desc");
+	}	
+	
+	private static String mapFieldName(String headerName) { 
+		String expectedMetadataFieldName = fieldNameMappings.get(headerName);
+		if(expectedMetadataFieldName == null) {
+			return headerName;
+		} else { 
+			return expectedMetadataFieldName;
+		}
+		
 	}
 }
