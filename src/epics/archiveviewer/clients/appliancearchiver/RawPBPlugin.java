@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import org.epics.archiverappliance.retrieval.client.EpicsMessage;
 import org.epics.archiverappliance.retrieval.client.GenMsgIterator;
+import org.epics.archiverappliance.retrieval.client.InfoChangeHandler;
 import org.epics.archiverappliance.retrieval.client.RawDataRetrieval;
 
 import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadInfo;
@@ -212,6 +213,9 @@ public class RawPBPlugin implements ClientPlugin {
 				}
 				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, info);
 				valueContainers[resultIndex] = currentVals;
+				if(strm != null) { 
+					strm.onInfoChange(currentVals);
+				}
 
 				long totalValues = 0;
 				if(strm != null) {

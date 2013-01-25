@@ -2,12 +2,17 @@ package epics.archiveviewer.clients.appliancearchiver;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.epics.archiverappliance.retrieval.client.EpicsMessage;
+import org.epics.archiverappliance.retrieval.client.InfoChangeHandler;
 
 import edu.stanford.slac.archiverappliance.PB.EPICSEvent;
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent.FieldValue;
+import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadInfo;
 import edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadType;
 import epics.archiveviewer.AVEntry;
 import epics.archiveviewer.ValuesContainer;
@@ -17,7 +22,7 @@ import epics.archiveviewer.ValuesContainer;
  * A values container backed by a event stream
  *
  */
-public class EventStreamValuesContainer implements ValuesContainer {
+public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHandler {
 	private AVEntry avEntry;
 	private Vector<EpicsMessage> events = new Vector<EpicsMessage>();
 	private double minValue = Double.MAX_VALUE;
@@ -33,26 +38,16 @@ public class EventStreamValuesContainer implements ValuesContainer {
 	public EventStreamValuesContainer(AVEntry av, EPICSEvent.PayloadInfo desc) {
 		this.avEntry = av;
 		this.payloadInfo = desc;
-		if(desc.hasPrecision()) {
-			formatter.setMaximumFractionDigits(new Double(desc.getPrecision()).intValue());
+		HashMap<String, String> headers = new HashMap<String, String>();
+		if(desc.getHeadersCount() > 0) { 
+			for(FieldValue f : desc.getHeadersList()) { 
+				headers.put(f.getName(), f.getVal());
+			}
 		}
-		
-		LinkedHashMap<String, Object> m = new LinkedHashMap<String, Object>(8);
-		if (desc.getElementCount() > 1)
-			m.put("type", "waveform");
-		else
-			m.put("type", "double");
-
-		m.put("disp_low", new Double(desc.getLowerDisplayLimit()));
-		m.put("disp_high", new Double(desc.getUpperDisplayLimit()));
-		m.put("alarm_low", new Double(desc.getLowerAlarmLimit()));
-		m.put("alarm_high", new Double(desc.getUpperAlarmLimit()));
-		m.put("warn_low", new Double(desc.getLowerWarningLimit()));
-		m.put("warn_high", new Double(desc.getUpperWarningLimit()));
-		m.put("precision", new Integer((int) desc.getPrecision()));
-		m.put("units", desc.getUnits());
-		av.setMetaData(m);
-
+		if(headers.containsKey("PREC")) {
+			formatter.setMaximumFractionDigits(Integer.parseInt(headers.get("PREC")));
+		}
+		handleInfoChange(desc);
 	}
 	
 	public void add(EpicsMessage dbrevent) throws IOException {
@@ -83,7 +78,11 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public String getUnits() throws Exception {
-		return payloadInfo.getUnits();
+		if(this.avEntry.getMetaData().containsKey("EGU")) {
+			return (String) this.avEntry.getMetaData().get("EGU");
+		} else { 
+			return "Cannot determine units";
+		}
 	}
 
 	@Override
@@ -146,8 +145,8 @@ public class EventStreamValuesContainer implements ValuesContainer {
 
 	@Override
 	public int getPrecision() {
-		if(payloadInfo.hasPrecision()) {
-			return new Double(payloadInfo.getPrecision()).intValue();
+		if(this.avEntry.getMetaData().containsKey("PREC")) {
+			return Integer.parseInt((String) this.avEntry.getMetaData().get("PREC"));
 		} else { 
 			return 0;
 		}
@@ -198,4 +197,22 @@ public class EventStreamValuesContainer implements ValuesContainer {
 		}
 	}
 
+	@Override
+	public void handleInfoChange(PayloadInfo desc) {
+		Map<String, Object> m = this.avEntry.getMetaData();
+		if(m == null) { 
+			m = new LinkedHashMap<String, Object>();
+			this.avEntry.setMetaData(m);
+		}
+		if (desc.getElementCount() > 1)
+			m.put("type", "waveform");
+		else
+			m.put("type", "double");
+
+		if(desc.getHeadersCount() > 0 ) { 
+			for(FieldValue f : desc.getHeadersList()) { 
+				m.put(f.getName(), f.getVal());
+			}
+		}
+	}
 }
