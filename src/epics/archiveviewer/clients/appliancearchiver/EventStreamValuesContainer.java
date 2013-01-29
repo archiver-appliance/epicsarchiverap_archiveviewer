@@ -19,7 +19,7 @@ import epics.archiveviewer.ValuesContainer;
 
 /**
  * @author mshankar
- * A values container backed by a event stream
+ * A values container backed by a event stream.
  *
  */
 public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHandler {
@@ -197,6 +197,11 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.epics.archiverappliance.retrieval.client.InfoChangeHandler#handleInfoChange(edu.stanford.slac.archiverappliance.PB.EPICSEvent.PayloadInfo)
+	 * Note that the EPICS archiver appliance sends the latest version of the headers from the engine as the PayloadInfo of the last stream
+	 * So, we implement a override scheme to override previous values (which could be stale) with more recent values.
+	 */
 	@Override
 	public void handleInfoChange(PayloadInfo desc) {
 		Map<String, Object> m = this.avEntry.getMetaData();
