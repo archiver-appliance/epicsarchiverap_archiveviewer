@@ -78,8 +78,8 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public String getUnits() throws Exception {
-		if(this.avEntry.getMetaData().containsKey("EGU")) {
-			return (String) this.avEntry.getMetaData().get("EGU");
+		if(this.avEntry.getMetaData().containsKey("units")) {
+			return (String) this.avEntry.getMetaData().get("units");
 		} else { 
 			return "Cannot determine units";
 		}
@@ -145,8 +145,8 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public int getPrecision() {
-		if(this.avEntry.getMetaData().containsKey("PREC")) {
-			return Integer.parseInt((String) this.avEntry.getMetaData().get("PREC"));
+		if(this.avEntry.getMetaData().containsKey("precision")) {
+			return Integer.parseInt((String) this.avEntry.getMetaData().get("precision"));
 		} else { 
 			return 0;
 		}
