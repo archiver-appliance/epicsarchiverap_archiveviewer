@@ -1,6 +1,7 @@
 package epics.archiveviewer.clients.appliancearchiver;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,6 +10,8 @@ import java.util.Vector;
 
 import org.epics.archiverappliance.retrieval.client.EpicsMessage;
 import org.epics.archiverappliance.retrieval.client.InfoChangeHandler;
+
+import com.google.protobuf.GeneratedMessage;
 
 import edu.stanford.slac.archiverappliance.PB.EPICSEvent;
 import edu.stanford.slac.archiverappliance.PB.EPICSEvent.FieldValue;
@@ -51,6 +54,24 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 	}
 	
 	public void add(EpicsMessage dbrevent) throws IOException {
+		if(!events.isEmpty() && dbrevent.hasFieldValues()) { 
+			HashMap<String, String> fieldValues = dbrevent.getFieldValues();
+			if(fieldValues.containsKey("cnxlostepsecs") && fieldValues.containsKey("cnxregainedepsecs")) { 
+				// This event has some information on connection loss.
+				// Create a fake event for the time period to show up in the viewer as a
+				long wedidnothavedataforepochseconds = Long.parseLong(fieldValues.get("cnxregainedepsecs")) - Long.parseLong(fieldValues.get("cnxlostepsecs"));
+				long currenttsepochseconds = dbrevent.getTimestamp().getTime()/1000;
+				long fakeEventEpochSeconds = currenttsepochseconds - wedidnothavedataforepochseconds;
+				long lastEventEpochSeconds = events.lastElement().getTimestamp().getTime()/1000;
+				if(fakeEventEpochSeconds < lastEventEpochSeconds) { 
+					fakeEventEpochSeconds = lastEventEpochSeconds;
+				}
+				Timestamp overrideTs = new Timestamp(fakeEventEpochSeconds*1000);
+				overrideTs.setNanos(999999999);
+				FakeMessage fakeMessage = new FakeMessage(events.lastElement(), overrideTs);
+				events.add(fakeMessage);
+			}
+		}
 		double val = dbrevent.getNumberValue().doubleValue();
 		if(val < minValue) minValue = val;
 		if(val > 0 && val < minPosValue) minPosValue = val;
@@ -121,7 +142,7 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public boolean isValid(int index) throws Exception {
-		return index < events.size() & events.get(index).getSeverity() != 3;
+		return (index < events.size()) && (events.get(index).getSeverity() != 3);
 	}
 
 	@Override
@@ -242,5 +263,56 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 			return expectedMetadataFieldName;
 		}
 		
+	}
+	
+	private class FakeMessage extends EpicsMessage { 
+		EpicsMessage original;
+		Timestamp overrideTs;
+		FakeMessage(EpicsMessage msg, Timestamp overrideTs) { 
+			super(msg);
+			this.original = msg;
+			this.overrideTs = overrideTs;
+		}
+		public boolean equals(Object obj) {
+			return original.equals(obj);
+		}
+		public int getElementCount() {
+			return original.getElementCount();
+		}
+		public HashMap<String, String> getFieldValues() {
+			return original.getFieldValues();
+		}
+		public GeneratedMessage getMessage() {
+			return original.getMessage();
+		}
+		public Number getNumberAt(int index) throws IOException {
+			return original.getNumberAt(index);
+		}
+		public Number getNumberValue() throws IOException {
+			return original.getNumberValue();
+		}
+		public int getSeverity() {
+			return 3;
+		}
+		public int getStatus() {
+//			3968 Est Repeat true false
+//			3856 Repeat true false
+//			3904 Disconnected false true
+//			3872 Archive Off false true
+//			3848 Archive Disabled false true
+			return 3904;
+		}
+		public Timestamp getTimestamp() {
+			return overrideTs;
+		}
+		public boolean hasFieldValues() {
+			return original.hasFieldValues();
+		}
+		public int hashCode() {
+			return original.hashCode();
+		}
+		public String toString() {
+			return original.toString();
+		}
 	}
 }
