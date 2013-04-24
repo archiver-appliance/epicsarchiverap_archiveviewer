@@ -43,6 +43,10 @@ public class RawPBPlugin implements ClientPlugin {
 			new RetrievalMethodImpl(new Integer(4), "linear", "Use the binned linear postprocessor", false, true),
 			new RetrievalMethodImpl(new Integer(5), "loess", "Use the binned loess postprocessor", false, true)
 			};
+	private static RetrievalMethodImpl[] retrievalMethodsForExport = {
+		new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, false),
+		};
+
 
 	private String originalURL = null;
 	private String serverURL = null;
@@ -286,7 +290,7 @@ public class RawPBPlugin implements ClientPlugin {
 
 	@Override
 	public RetrievalMethod[] getRetrievalMethodsForExport() {
-		return retrievalMethodsForPlot;
+		return retrievalMethodsForExport;
 	}
 
 	@Override

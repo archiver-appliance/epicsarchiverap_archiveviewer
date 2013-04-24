@@ -31,6 +31,7 @@ import epics.archiveviewer.ClientPlugin;
 import epics.archiveviewer.Exporter;
 import epics.archiveviewer.ValuesContainer;
 import epics.archiveviewer.base.util.AVProgressTask;
+import epics.archiveviewer.clients.appliancearchiver.EventStreamValuesContainer;
 import epics.archiveviewer.clients.channelarchiver.DiscreteValuesContainer;
 import epics.archiveviewer.clients.channelarchiver.NumericValuesContainer;
 
@@ -192,7 +193,7 @@ public class MatlabExporter extends Exporter{
 			if (tadm != null)
 				tadm.waitAllDead();
 			this.clear();
-			throw new Exception ("MatlabExporter -- saveExportData problem\n"+e.toString());
+			throw new Exception ("MatlabExporter -- saveExportData problem\n"+e.toString(), e);
 		}
 	}
 	/**
@@ -515,6 +516,17 @@ public class MatlabExporter extends Exporter{
 				}
 			}
 			contents.add(temp);
+		}
+		else if (vc instanceof EventStreamValuesContainer) { 
+			contents.add(new MLChar (matlab_var_name[cur_pv]+"_data_type", "Numeric"));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_precision",makeDArrCol1(vc.getPrecision()), 1));
+			contents.add(new MLChar (matlab_var_name[cur_pv]+"_units", vc.getUnits()));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_high",makeDArrCol1(Double.parseDouble((String)meta.get("disp_high"))), 1));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_low",makeDArrCol1(Double.parseDouble((String)meta.get("disp_low"))), 1));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_high",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_high"))), 1));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_low",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_low"))), 1));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_high",makeDArrCol1(Double.parseDouble((String)meta.get("warn_high"))), 1));
+			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_low",makeDArrCol1((Double.parseDouble((String)meta.get("warn_low")))), 1));
 		}
 		else
 			throw new Exception ("MatlabExporter -- save_control_info: unknown ValueContainer");

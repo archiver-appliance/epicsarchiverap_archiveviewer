@@ -536,7 +536,7 @@ public class UseCases {
 		
 		while(	nrExportedValuesPerAVE < requestedTotalNumberOfValuesPerAVE && 
 				forceToEndAfterExportingCurrentlyRetrievedData == false){
-			if(	nrValuesPerRequest != requestedTotalNumberOfValuesPerAVE && 
+			if(	nrValuesPerRequest >= requestedTotalNumberOfValuesPerAVE && 
 				retrievalMethod.reducesResolution() == true)
 			{
 				//if method reduces resolution, the user actually specifies a period
