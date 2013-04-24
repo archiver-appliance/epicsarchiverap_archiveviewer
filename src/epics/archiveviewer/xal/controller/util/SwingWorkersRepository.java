@@ -192,6 +192,7 @@ public class SwingWorkersRepository {
 				catch(Exception e)
 				{
 					avBase.displayError("Can't export", e);
+					e.printStackTrace(System.err);
 				}
 				return null;
 			}
