@@ -370,10 +370,10 @@ public class MatlabExporter extends Exporter{
 		userStartTimeInMsecs = null;
 		if (mdsib_time != null)
 			for (int i = 0; i < mdsib_time.length; i++)
-				mdsib_time[i].removeStorage();
+				if(mdsib_time[i] != null) mdsib_time[i].removeStorage();
 		if (mdsib_data != null)
 			for (int i = 0; i < mdsib_data.length; i++)
-				mdsib_data[i].removeStorage();
+				if(mdsib_data[i] != null) mdsib_data[i].removeStorage();
 		mdsib_time = null;
 		mdsib_data = null;
 	}
@@ -521,12 +521,12 @@ public class MatlabExporter extends Exporter{
 			contents.add(new MLChar (matlab_var_name[cur_pv]+"_data_type", "Numeric"));
 			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_precision",makeDArrCol1(vc.getPrecision()), 1));
 			contents.add(new MLChar (matlab_var_name[cur_pv]+"_units", vc.getUnits()));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_high",makeDArrCol1(Double.parseDouble((String)meta.get("disp_high"))), 1));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_low",makeDArrCol1(Double.parseDouble((String)meta.get("disp_low"))), 1));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_high",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_high"))), 1));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_low",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_low"))), 1));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_high",makeDArrCol1(Double.parseDouble((String)meta.get("warn_high"))), 1));
-			contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_low",makeDArrCol1((Double.parseDouble((String)meta.get("warn_low")))), 1));
+			if(meta.containsKey("disp_high")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_high",makeDArrCol1(Double.parseDouble((String)meta.get("disp_high"))), 1));
+			if(meta.containsKey("disp_low")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_display_low",makeDArrCol1(Double.parseDouble((String)meta.get("disp_low"))), 1));
+			if(meta.containsKey("alarm_high")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_high",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_high"))), 1));
+			if(meta.containsKey("alarm_low")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_alarm_low",makeDArrCol1(Double.parseDouble((String)meta.get("alarm_low"))), 1));
+			if(meta.containsKey("warn_high")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_high",makeDArrCol1(Double.parseDouble((String)meta.get("warn_high"))), 1));
+			if(meta.containsKey("warn_low")) contents.add(new MLDouble (matlab_var_name[cur_pv]+"_warning_low",makeDArrCol1((Double.parseDouble((String)meta.get("warn_low")))), 1));
 		}
 		else
 			throw new Exception ("MatlabExporter -- save_control_info: unknown ValueContainer");
