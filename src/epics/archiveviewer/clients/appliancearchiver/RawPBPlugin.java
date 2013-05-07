@@ -45,6 +45,7 @@ public class RawPBPlugin implements ClientPlugin {
 			};
 	private static RetrievalMethodImpl[] retrievalMethodsForExport = {
 		new RetrievalMethodImpl(new Integer(0), "raw", "Raw PB return", false, false),
+		new RetrievalMethodImpl(new Integer(2), "average", "Use the mean postprocessor", false, true)
 		};
 
 
@@ -180,6 +181,10 @@ public class RawPBPlugin implements ClientPlugin {
 				String postProcessor = null;
 				if(requestedMethodKey != null) { 
 					int binSize = (int) (end.getTime() - start.getTime())/(1000*requestedNumberOfValues);
+					if(binSize <= 0) { 
+						logger.fine("Using a default bin size of 1");
+						binSize = 1;
+					}
 					if (requestedMethodKey.equals("2")) {
 						logger.fine("Using the average postprocessor");
 						postProcessor = "mean_" + binSize;
