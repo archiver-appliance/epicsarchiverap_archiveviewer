@@ -21,6 +21,12 @@ public class RequestObject extends Object
     private boolean includeSparcified;
     
     /**
+     * The spreadsheet export requires some special handling in the archiver appliance. 
+     * We need to tell the appliance client code that this is indeed a spreadsheet export.
+     */
+    private String exporterID = null;
+    
+    /**
      * Default constructor
      *
      */
@@ -160,4 +166,12 @@ public class RequestObject extends Object
     		hashCode += method.getKey().hashCode();
     	return hashCode;    	
     }
+
+	public String getExporterID() {
+		return exporterID;
+	}
+
+	public void setExporterID(String exporterID) {
+		this.exporterID = exporterID;
+	}
 }

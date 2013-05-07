@@ -150,6 +150,7 @@ public class RawPBPlugin implements ClientPlugin {
 		RequestObject requestObject;
 		int requestedNumberOfValues;
 		String requestedMethodKey;
+		String exporterId;
 		
 		public FetchDataFromAppliance(String pvName, AVEntry avEntry, ValuesContainer[] valueContainers, int resultIndex, RequestObject requestObject) {
 			this.pvName = pvName;
@@ -158,6 +159,7 @@ public class RawPBPlugin implements ClientPlugin {
 			this.resultIndex = resultIndex;
 			this.requestObject = requestObject;
 			this.requestedNumberOfValues = requestObject.getRequestedNrOfValues();
+			this.exporterId = requestObject.getExporterID();
 			if(requestObject.getMethod() != null && requestObject.getMethod().getKey() != null) {
 				this.requestedMethodKey = requestObject.getMethod().getKey().toString();
 			} else { 
@@ -177,6 +179,11 @@ public class RawPBPlugin implements ClientPlugin {
 				// We are skipping the nanos when making the request to the server.
 				Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
+				
+				if(this.exporterId != null && this.exporterId.equals("spreadsheet")) { 
+					logger.info("If you are exporting to a spreadsheet, regardless of the retrieval method, we use average to get the timestamps aligned.");
+					this.requestedMethodKey = "2";
+				}
 				
 				String postProcessor = null;
 				if(requestedMethodKey != null) { 

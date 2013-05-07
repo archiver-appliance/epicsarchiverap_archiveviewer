@@ -503,8 +503,10 @@ public class UseCases {
 		request.setMethod(retrievalMethod);
 		request.setRequestedNrOfValues(nrValuesPerRequest);
 
-                // For exporting data, use dense (non-sparcified) data.
-                request.setIncludeSparcified(false);
+		// For exporting data, use dense (non-sparcified) data.
+		request.setIncludeSparcified(false);
+		// Tell the client code what the exporter is so that they can take some special steps
+		request.setExporterID(exporterId);
 		
 		int nrExportedValuesPerAVE = 0;			
 		
