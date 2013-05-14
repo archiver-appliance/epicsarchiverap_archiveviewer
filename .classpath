@@ -16,6 +16,6 @@
 	<classpathentry kind="lib" path="ext_jars/servlet.jar"/>
 	<classpathentry kind="lib" path="ext_jars/xal.jar"/>
 	<classpathentry kind="lib" path="ext_jars/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="ext_jars/xmlrpc-1.1.jar"/>
+	<classpathentry kind="lib" path="ext_jars/xmlrpc-1.1.jar" sourcepath="C:/Temp/xmlrpcsr.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
