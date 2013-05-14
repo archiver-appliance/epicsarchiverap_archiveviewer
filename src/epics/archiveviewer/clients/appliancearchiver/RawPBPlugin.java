@@ -124,7 +124,7 @@ public class RawPBPlugin implements ClientPlugin {
 			ArrayList<Callable<String>> callables = new ArrayList<Callable<String>>();
 			int pvIndex = 0;
 			for(String pvName : pvNames) {
-				callables.add(new FetchDataFromAppliance(pvName, archiveEntries[pvIndex], valueContainers, pvIndex, requestObject));
+				callables.add(new FetchDataFromAppliance(pvName, archiveEntries[pvIndex], valueContainers, pvIndex, requestObject, archiveEntries.length));
 				pvIndex++;
 			}
 
@@ -151,8 +151,9 @@ public class RawPBPlugin implements ClientPlugin {
 		int requestedNumberOfValues;
 		String requestedMethodKey;
 		String exporterId;
+		private int totalPVSInRequest;
 		
-		public FetchDataFromAppliance(String pvName, AVEntry avEntry, ValuesContainer[] valueContainers, int resultIndex, RequestObject requestObject) {
+		public FetchDataFromAppliance(String pvName, AVEntry avEntry, ValuesContainer[] valueContainers, int resultIndex, RequestObject requestObject, int totalPVSInRequest) {
 			this.pvName = pvName;
 			this.avEntry = avEntry;
 			this.valueContainers = valueContainers;
@@ -160,6 +161,7 @@ public class RawPBPlugin implements ClientPlugin {
 			this.requestObject = requestObject;
 			this.requestedNumberOfValues = requestObject.getRequestedNrOfValues();
 			this.exporterId = requestObject.getExporterID();
+			this.totalPVSInRequest = totalPVSInRequest;
 			if(requestObject.getMethod() != null && requestObject.getMethod().getKey() != null) {
 				this.requestedMethodKey = requestObject.getMethod().getKey().toString();
 			} else { 
@@ -180,8 +182,8 @@ public class RawPBPlugin implements ClientPlugin {
 				Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
 				
-				if(this.exporterId != null && this.exporterId.equals("spreadsheet")) { 
-					logger.info("If you are exporting to a spreadsheet, regardless of the retrieval method, we use average to get the timestamps aligned.");
+				if(this.exporterId != null && this.exporterId.equals("spreadsheet") && totalPVSInRequest > 1) { 
+					logger.info("If you are exporting to a spreadsheet and we have more than 1 PV, regardless of the retrieval method, we use average to get the timestamps aligned.");
 					this.requestedMethodKey = "2";
 				}
 				
