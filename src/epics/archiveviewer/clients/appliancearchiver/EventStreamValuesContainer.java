@@ -53,8 +53,8 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 		handleInfoChange(desc);
 	}
 	
-	public void add(EpicsMessage dbrevent) throws IOException {
-		if(!events.isEmpty() && dbrevent.hasFieldValues()) { 
+	public void add(EpicsMessage dbrevent, boolean addFakeEvents) throws IOException {
+		if(!events.isEmpty() && dbrevent.hasFieldValues() && addFakeEvents) { 
 			HashMap<String, String> fieldValues = dbrevent.getFieldValues();
 			if(fieldValues.containsKey("cnxlostepsecs") && fieldValues.containsKey("cnxregainedepsecs")) { 
 				// This event has some information on connection loss.
@@ -314,5 +314,13 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 		public String toString() {
 			return original.toString();
 		}
+	}
+
+	public EPICSEvent.PayloadInfo getPayloadInfo() {
+		return payloadInfo;
+	}
+
+	public Vector<EpicsMessage> getEvents() {
+		return events;
 	}
 }
