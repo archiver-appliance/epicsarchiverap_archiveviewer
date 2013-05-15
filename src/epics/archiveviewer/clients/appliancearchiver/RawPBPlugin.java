@@ -143,7 +143,7 @@ public class RawPBPlugin implements ClientPlugin {
 		
 		if(exporterId != null && exporterId.equals("spreadsheet") && totalPVSInRequest > 1) {
 			logger.info("Using client side spreadsheet interpolation");
-			valueContainers = spreadSheetInterpolate(valueContainers);
+			valueContainers = SpreadSheetExporter.spreadSheetInterpolate(valueContainers);
 		}
 		
 		return valueContainers;
@@ -373,108 +373,5 @@ public class RawPBPlugin implements ClientPlugin {
 		return null;
 	}
 	
-	
-	/**
-	 * Do a ChannelArchiver style spreadsheet interpolation on the client side.
-	 * This should generate the same number of elements in all the value containers.
-	 * @param srcValueContainers
-	 * @return
-	 */
-	private static EventStreamValuesContainer[] spreadSheetInterpolate(EventStreamValuesContainer[] srcValueContainers) throws IOException {
-		EventStreamValuesContainer[] returnValueContainers = new EventStreamValuesContainer[srcValueContainers.length];
-		// indexes represents the current event that is used to generate the data
-		int[] indexes = new int[srcValueContainers.length];
-		for(int i = 0; i < srcValueContainers.length; i++) { 
-			returnValueContainers[i] = new EventStreamValuesContainer(srcValueContainers[i].getAVEntry(), srcValueContainers[i].getPayloadInfo());
-			indexes[i] = -1;
-		}
-
-		int currentMinIndex = findMinimumTimestampAndAdvance(indexes, srcValueContainers);
-		while(currentMinIndex != -1) {
-			generateData(indexes, currentMinIndex, srcValueContainers, returnValueContainers);
-			currentMinIndex = findMinimumTimestampAndAdvance(indexes, srcValueContainers);
-		}
-		
-		checkReturnValueSizes(returnValueContainers);
-		
-		return returnValueContainers;
-	}
-
-	private static long FUTURE_TIMESTAMP = System.currentTimeMillis() + 2*365*24*60*60*100;
-	
-	/**
-	 * Find the EventStreamValuesContainer that has data and whose data has the least timestamp.
-	 * If we find such an data element, we advance that index.
-	 * @param indexes
-	 * @param srcValueContainers
-	 * @return -1 if we no longer have data.
-	 */
-	private static int findMinimumTimestampAndAdvance(int[] indexes, EventStreamValuesContainer[] srcValueContainers) {
-		Timestamp currentMin = new Timestamp(FUTURE_TIMESTAMP);
-		int currentMinIndex = -1;
-		for(int i = 0; i < indexes.length; i++) { 
-			int nextElemIndex = indexes[i]+1;
-			if(srcValueContainers[i].getEvents() != null && nextElemIndex < srcValueContainers[i].getEvents().size()) {
-				Timestamp eventTs = srcValueContainers[i].getEvents().get(nextElemIndex).getTimestamp();
-				if(eventTs.before(currentMin)) { 
-					currentMin = eventTs;
-					currentMinIndex = i;
-				}
-			}
-		}
-		if(currentMinIndex != -1) { 
-			indexes[currentMinIndex] = indexes[currentMinIndex]+1;
-		}
-
-		return currentMinIndex;
-	}
-	
-	/**
-	 * Generate spreadsheet interpolated data and advance pointer.
-	 * We use the timestamp at srcValueContainers[currentMinIndex].getEvents().get(indexes[currentMinIndex])
-	 * And we use the values at various indexes[locations] to generate data
-	 * @param indexes
-	 * @param currentMinIndex
-	 * @param srcValueContainers
-	 * @param destValueContainers
-	 */
-	private static void generateData(int[] indexes, int currentMinIndex, EventStreamValuesContainer[] srcValueContainers, EventStreamValuesContainer[] destValueContainers) throws IOException { 
-		Timestamp currentMin = srcValueContainers[currentMinIndex].getEvents().get(indexes[currentMinIndex]).getTimestamp();
-		for(int i = 0; i < indexes.length; i++) { 
-			Vector<EpicsMessage> srcEvents = srcValueContainers[i].getEvents();
-			if(srcEvents != null && !srcEvents.isEmpty()) {
-				int srcEventIndex = indexes[i];
-				if(srcEventIndex >= srcEvents.size()) { 
-					// Pick the last event if we are past the size of the array
-					srcEventIndex = srcEvents.size() - 1;
-				} else if (srcEventIndex == -1) {
-					// If we have not started yet, pick the first event.
-					// This differs a little from the ChannelArchiver.
-					srcEventIndex = 0;
-				}
-				EpicsMessage msg = srcEvents.get(srcEventIndex);
-				EpicsMessage newMsg = new EpicsMessage(msg);
-				newMsg.setTimestamp(currentMin);
-				destValueContainers[i].add(newMsg, false);
-			}
-		}
-	}
-
-	/** 
-	 * Make sure that all the returnValueContainers are the same length...
-	 * @param returnValueContainers
-	 */
-	private static void checkReturnValueSizes(EventStreamValuesContainer[] returnValueContainers) {
-		int returnLength = -1;
-		for(int i = 0; i < returnValueContainers.length; i++) { 
-			if(returnLength == -1) { 
-				returnLength = returnValueContainers[i].getEvents().size();
-			} else { 
-				if(returnLength != returnValueContainers[i].getEvents().size()) { 
-					logger.warning("returnLength " + returnLength + " and container " + i + " has " + returnValueContainers[i].getEvents().size() + " and they differ in length");
-				}
-			}
-		}
-	}
 	
 }
