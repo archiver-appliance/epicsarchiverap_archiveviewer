@@ -148,6 +148,12 @@ public class SpreadSheetExporter {
 			indivPVDatas.add(loadTabFile(indivPVFileName));
 		}
 		
+		for(HashMap<String, HashMap<String, String>> indivPVData : indivPVDatas) {
+			for(String pvName : indivPVData.keySet()) {
+				System.err.println(pvName + " has " + indivPVData.get(pvName).size() + " individual values");
+			}
+		}
+		
 		for(HashMap<String, HashMap<String, String>> indivPVData : indivPVDatas) { 
 			for(String pvName : indivPVData.keySet()) { 
 				HashMap<String, String> indivPVSamples = indivPVData.get(pvName);
@@ -159,6 +165,8 @@ public class SpreadSheetExporter {
 						System.err.println("For pv " + pvName + ", data at timestamp " + ts + " exists but not in the combined export");
 					} else if (!combinedVal.equals(indivVal)) { 
 						System.err.println("For pv " + pvName + ", data at timestamp " + ts + " has indiv val " + indivVal + " and combined val " + combinedVal);
+					} else { 
+						// System.err.println("For pv " + pvName + ", data at timestamp " + ts + " has indiv val " + indivVal + " and combined val " + combinedVal);
 					}
 				}
 			}
@@ -181,20 +189,25 @@ public class SpreadSheetExporter {
 			String line = is.readLine();
 			boolean postTimestamp = false;
 			while(line != null) { 
-				if(line.startsWith("#Timestamp")) { 
+				if(line.startsWith("#Timestamp")) {
 					postTimestamp = true;
-					String[] headers = line.split(" \t");
-					int colunmNumber = 0;
+					String[] headers = line.split("[\t]");
+					int pvNumber = 0;
 					for(String header : headers) { 
-						if(!header.contains("Timestamp") && !header.contains("Status")) { 
+						if(!header.isEmpty() && !header.contains("Timestamp") && !header.contains("Status")) {
 							String pvName = header;
-							pvName2Column.put(pvName, new Integer(colunmNumber));
+							// 1 is timestamp and we have 3 columns for each PV
+							pvName2Column.put(pvName, new Integer(1 + pvNumber*3));
 							retVal.put(pvName, new HashMap<String, String>());
+							pvNumber++;
 						}
-						colunmNumber++;
 					}
+					for(String pvName : pvName2Column.keySet()) { 
+						logger.info("Found pvName " + pvName + " in file " + fileName);
+					}
+					
 				} else if(postTimestamp) { 
-					String[] elements = line.split(" \t");
+					String[] elements = line.split("[\t]");
 					String ts = elements[0];
 					for(String pvName : pvName2Column.keySet()) { 
 						int columnNumber = pvName2Column.get(pvName);
