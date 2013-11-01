@@ -142,7 +142,15 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public boolean isValid(int index) throws Exception {
-		return (index < events.size()) && (events.get(index).getSeverity() != 3);
+		if(index >= events.size()) { 
+			return false;
+		}
+		
+		int severityNum = events.get(index).getSeverity();
+		if (severityNum == -1 || severityNum == 3 || severityNum == 3904 || severityNum == 3872 || severityNum == 3848)
+			return false;
+		
+		return true;
 	}
 
 	@Override
