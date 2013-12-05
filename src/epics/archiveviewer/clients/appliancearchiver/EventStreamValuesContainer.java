@@ -73,6 +73,10 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 			}
 		}
 		double val = dbrevent.getNumberValue().doubleValue();
+		if(Double.isNaN(val) || Double.isInfinite(val)) { 
+			// Skipping adding NAN's and infinities.
+			return;
+		}
 		if(val < minValue) minValue = val;
 		if(val > 0 && val < minPosValue) minPosValue = val;
 		if(val > maxValue) maxValue = val;
