@@ -105,6 +105,9 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 	public String getUnits() throws Exception {
 		if(this.avEntry.getMetaData().containsKey("units")) {
 			return (String) this.avEntry.getMetaData().get("units");
+		} else if (payloadInfo.getType().equals(PayloadType.SCALAR_ENUM)) {
+			// In this case, the viewer displays the string "discrete" in the units section.
+			return "";
 		} else { 
 			return "Cannot determine units";
 		}
@@ -141,7 +144,7 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public boolean isDiscrete() {
-		return payloadInfo.getType() == PayloadType.SCALAR_ENUM;
+		return payloadInfo.getType().equals(PayloadType.SCALAR_ENUM);
 	}
 
 	@Override
