@@ -26,7 +26,7 @@ public class SpreadSheetExporter {
 	 * @param srcValueContainers
 	 * @return
 	 */
-	static EventStreamValuesContainer[] spreadSheetInterpolate(EventStreamValuesContainer[] srcValueContainers) throws IOException {
+	public static EventStreamValuesContainer[] spreadSheetInterpolate(EventStreamValuesContainer[] srcValueContainers) throws IOException {
 		EventStreamValuesContainer[] returnValueContainers = new EventStreamValuesContainer[srcValueContainers.length];
 		// indexes represents the current event that is used to generate the data
 		int[] indexes = new int[srcValueContainers.length];
@@ -46,6 +46,9 @@ public class SpreadSheetExporter {
 		return returnValueContainers;
 	}
 
+	/**
+	 * Use two years into the future as an initial value
+	 */
 	private static long FUTURE_TIMESTAMP = System.currentTimeMillis() + 2*365*24*60*60*100;
 	
 	/**

@@ -217,9 +217,9 @@ public class UseCases {
 			    	request.setRequestedNrOfValues(((FormulaGraph)f).getRequestedNumberOfValues());
 			    }
 
-                            request.setRange(requestStartTime, requestEndTime);
-
-                            request.setIncludeSparcified(avBase.getIncludeSparcified());
+			    request.setRange(requestStartTime, requestEndTime);
+			    request.setIncludeSparcified(avBase.getIncludeSparcified());
+			    request.setExporterID("spreadsheet");
 			   	
 		    	//add to the map of resolved formulas, i.e. formulas that have no formula arguments
 		    	formulasWithPVArgumentsOnlyMap.put(currentFormulaWithPVArgumentsOnly.getAVEntry().getName(), currentFormulaWithPVArgumentsOnly);

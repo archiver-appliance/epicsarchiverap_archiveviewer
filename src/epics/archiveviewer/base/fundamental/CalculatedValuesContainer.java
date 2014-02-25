@@ -132,6 +132,7 @@ public class CalculatedValuesContainer implements ValuesContainer
 				}
 				if(vcs[j].isValid(i) == false)
 				{
+					// System.out.println("Invalid argument vcs[" + j + "](" + i + ")");
 					isInvalidArgument = true;
 					break;
 				}
