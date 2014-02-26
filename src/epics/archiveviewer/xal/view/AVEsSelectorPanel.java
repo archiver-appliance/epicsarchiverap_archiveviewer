@@ -33,7 +33,7 @@ public class AVEsSelectorPanel extends AVAbstractPanel
         private JLabel densityLabel;
 	private JComboBox densitySelectionBox;
 
-        private String yesNo[] = {"Yes", "No"};
+	private String sparsificationOperators[] = {"firstSample", "mean", "median", "min", "max", "Raw"};
 
 	private JButton searchButton;
 	private JTextField inputField;
@@ -93,9 +93,9 @@ public class AVEsSelectorPanel extends AVAbstractPanel
 	protected void createComponents(){
 		this.directoriesSelectionBox = new JComboBox();
 
-		this.densityLabel = new JLabel("Include Sparsified Data");
-		this.densitySelectionBox = new JComboBox(yesNo);
-                this.densitySelectionBox.setSelectedIndex(0);
+		this.densityLabel = new JLabel("Apply operator");
+		this.densitySelectionBox = new JComboBox(sparsificationOperators);
+		this.densitySelectionBox.setSelectedIndex(0);
 
 		this.inputField = new JTextField(10);
 		this.searchButton = new JButton("search");
@@ -113,6 +113,10 @@ public class AVEsSelectorPanel extends AVAbstractPanel
 	public JComboBox getDensitySelectionBox()
 	{
 		return this.densitySelectionBox;
+	}
+	
+	public String getDensitySelection() { 
+		return this.sparsificationOperators[this.densitySelectionBox.getSelectedIndex()];
 	}
 	
 	public JButton getSearchButton()

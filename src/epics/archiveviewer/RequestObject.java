@@ -17,8 +17,7 @@ public class RequestObject extends Object
     /** end time*/
     private double endTimeInMsecs;
 
-    /** Flag indicating whether to include sparcified archiver data */
-    private boolean includeSparcified;
+    private String sparsificationOperator;
     
     /**
      * The spreadsheet export requires some special handling in the archiver appliance. 
@@ -43,13 +42,13 @@ public class RequestObject extends Object
      * @param nrOfValues request number of values
      */
     public RequestObject(double startTime, double endTime, RetrievalMethod rm, int nrOfValues,
-        boolean useSparcified)
+        String sparsificationOperator)
     {
         this.startTimeInMsecs = startTime;
         this.endTimeInMsecs = endTime;
         this.method = rm;
         this.requestedNrOfValues = nrOfValues;
-        this.includeSparcified = useSparcified;
+        this.sparsificationOperator = sparsificationOperator;
     }
 	/**
 	 * Sets the retrieval method
@@ -79,11 +78,6 @@ public class RequestObject extends Object
         this.endTimeInMsecs = endInMsecs;
     }
 
-    public void setIncludeSparcified(boolean useSparcified)
-    {
-        this.includeSparcified = useSparcified;
-    }
-    
 	 /**
 	  * Returns end time of this request
 	  * @return end time of this request
@@ -119,11 +113,6 @@ public class RequestObject extends Object
         return startTimeInMsecs;
     }
 
-    public boolean getIncludeSparcified()
-    {
-        return includeSparcified;
-    }
-    
     /***
      * Returns true if o is a RequestObject and has the same parameters as this RequestObject;
      * false otherwise
@@ -173,5 +162,19 @@ public class RequestObject extends Object
 
 	public void setExporterID(String exporterID) {
 		this.exporterID = exporterID;
+	}
+
+	/**
+	 * @return the sparsificationOperator
+	 */
+	public String getSparsificationOperator() {
+		return sparsificationOperator;
+	}
+
+	/**
+	 * @param sparsificationOperator the sparsificationOperator to set
+	 */
+	public void setSparsificationOperator(String sparsificationOperator) {
+		this.sparsificationOperator = sparsificationOperator;
 	}
 }

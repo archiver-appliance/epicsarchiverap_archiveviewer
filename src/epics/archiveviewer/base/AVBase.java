@@ -57,7 +57,7 @@ public class AVBase implements MessageListener
 	private String exportDirectory;
 	private String snapshotDirectory;
 
-        private boolean includeSparcified;
+	private String sparsificationOperator;
 	
 	public AVBase() throws Exception
 	{
@@ -203,16 +203,6 @@ public class AVBase implements MessageListener
 		this.exportDirectory =  exportDir;
 	}
 
-	public boolean getIncludeSparcified()
-	{
-		return this.includeSparcified;
-        }
-
-	public void setIncludeSparcified(boolean sparcified)
-	{
-		this.includeSparcified = sparcified;
-        }
-
 	public String getSnapshotDirectory()
 	{
 		return this.snapshotDirectory;
@@ -221,5 +211,19 @@ public class AVBase implements MessageListener
 	public void setSnapshotDirectory(String snapshotDir)
 	{
 		this.snapshotDirectory = snapshotDir;
+	}
+
+	/**
+	 * @return the sparsificationOperator
+	 */
+	public String getSparsificationOperator() {
+		return sparsificationOperator;
+	}
+
+	/**
+	 * @param sparsificationOperator the sparsificationOperator to set
+	 */
+	public void setSparsificationOperator(String sparsificationOperator) {
+		this.sparsificationOperator = sparsificationOperator;
 	}
 }

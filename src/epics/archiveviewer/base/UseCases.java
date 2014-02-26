@@ -218,7 +218,7 @@ public class UseCases {
 			    }
 
 			    request.setRange(requestStartTime, requestEndTime);
-			    request.setIncludeSparcified(avBase.getIncludeSparcified());
+			    request.setSparsificationOperator(avBase.getSparsificationOperator());
 			    request.setExporterID("spreadsheet");
 			   	
 		    	//add to the map of resolved formulas, i.e. formulas that have no formula arguments
@@ -269,7 +269,7 @@ public class UseCases {
 		request.setRange(requestStartTime, requestEndTime);
 		request.setMethod(retrievalMethod);
 		request.setRequestedNrOfValues(requestedNrOfValues);
-                request.setIncludeSparcified(avBase.getIncludeSparcified());
+	    request.setSparsificationOperator(avBase.getSparsificationOperator());
 		
 		AVEntry[] avEntries = new AVEntry[pvGraphs.length];
 		for(int i=0; i<pvGraphs.length; i++)
@@ -504,7 +504,7 @@ public class UseCases {
 		request.setRequestedNrOfValues(nrValuesPerRequest);
 
 		// For exporting data, use dense (non-sparcified) data.
-		request.setIncludeSparcified(false);
+	    request.setSparsificationOperator(avBase.getSparsificationOperator());
 		// Tell the client code what the exporter is so that they can take some special steps
 		request.setExporterID(exporterId);
 		

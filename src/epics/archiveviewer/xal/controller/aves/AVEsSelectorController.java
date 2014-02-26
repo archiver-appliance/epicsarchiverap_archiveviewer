@@ -79,34 +79,8 @@ public class AVEsSelectorController
             public void actionPerformed(ActionEvent arg0)
             {
                 String item = (String) asp.getDensitySelectionBox().getSelectedItem();
-                boolean sparcified;
-
-                if (item.equals("Yes"))
-                {
-                    sparcified = avController.getAVBase().getIncludeSparcified();
-                    if (!sparcified)
-                    {
-                        avController.getAVBase().getVCsCache().clear();
-                    }
-
-                    sparcified = true;
-                }
-                else if (item.equals("No"))
-                {
-                    sparcified = avController.getAVBase().getIncludeSparcified();
-                    if (sparcified)
-                    {
-                        avController.getAVBase().getVCsCache().clear();
-                    }
-
-                    sparcified = false;
-                }
-                else
-                {
-                    sparcified = false;
-                }
-
-                avController.getAVBase().setIncludeSparcified(sparcified);
+                avController.getAVBase().setSparsificationOperator(item);
+                avController.getAVBase().getVCsCache().clear();
             }
         };
     }
@@ -264,7 +238,7 @@ public class AVEsSelectorController
     	this.asp = _asp;
         this.adsRepository = this.avController.getAVBase().getArchiveDirectoriesRepository();
         
-        this.avController.getAVBase().setIncludeSparcified(true);
+        this.avController.getAVBase().setSparsificationOperator(_asp.getDensitySelection());
         this.asp.getDensitySelectionBox().addActionListener(createDensitySelectionListener());
         
         ActionListener displaySearchDialogListener  = createDisplaySearchDialogListener();

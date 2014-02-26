@@ -172,6 +172,7 @@ public class RawPBPlugin implements ClientPlugin {
 			this.totalPVSInRequest = totalPVSInRequest;
 			if(requestObject.getMethod() != null && requestObject.getMethod().getKey() != null) {
 				this.requestedMethodKey = requestObject.getMethod().getKey().toString();
+				logger.info("Using requested method " + this.requestedMethodKey);
 			} else { 
 				logger.info("Defaulting to raw request method");
 				this.requestedMethodKey = "0";
@@ -185,39 +186,55 @@ public class RawPBPlugin implements ClientPlugin {
 		public String call() throws Exception {
 			try {
 				System.out.println("Making a call");
-				boolean useReducedDataset = requestObject.getIncludeSparcified();
+				String sparsificationOperator = requestObject.getSparsificationOperator();
+				if(sparsificationOperator == null) { 
+					sparsificationOperator = "firstSample";
+				}
+				
+				// For the appliance which does not have a separate sparsified data set, useReducedDataset does not make much sense. 
+				// But we pass in a suitable approximation anyways for future reference.
+				boolean useReducedDataset = true;
+				if(sparsificationOperator.equalsIgnoreCase("Raw")) { 
+					useReducedDataset = false;
+				}
+
 				// We are skipping the nanos when making the request to the server.
 				Timestamp start = new Timestamp((long) requestObject.getStartTimeInMsecs());
 				Timestamp end = new Timestamp((long) requestObject.getEndTimeInMsecs());
 				
-				String postProcessor = null;
-				if(requestedMethodKey != null) { 
-					int binSize = (int) (end.getTime() - start.getTime())/(1000*requestedNumberOfValues);
-					if(binSize <= 0) { 
-						logger.fine("Using a default bin size of 1");
-						binSize = 1;
-					}
-					if (requestedMethodKey.equals("2")) {
-						logger.fine("Using the average postprocessor");
-						postProcessor = "mean_" + binSize;
-					} else if(requestedMethodKey.equals("4")) {
-						logger.fine("Using the linear postprocessor");
-						postProcessor = "linear_" + binSize;
-					} else if(requestedMethodKey.equals("5")) {
-						logger.fine("Using the loess postprocessor");
-						postProcessor = "loess_" + binSize;
+				// We based the postProcessor decision on the sparsification operator and the duration of the request
+				if(sparsificationOperator.equalsIgnoreCase("Raw")) { 
+					logger.info("Skipping computation of bin size as the user asked for raw data");
+				} else { 
+					if(!pvName.contains("(")) { 
+						logger.info("Using operator " + sparsificationOperator);
+						long durationInSecs = (end.getTime() - start.getTime())/1000;
+						if(durationInSecs >= 0 && durationInSecs <= 86400) { 
+							logger.info("Duration less than a day - using raw data for pv " + pvName);
+							sparsificationOperator = null;
+						} else if(durationInSecs > 86400 && durationInSecs <= 7*86400) { 
+							logger.info("Duration more than a day and less than a week - using bin size of 60 " + pvName);
+							sparsificationOperator = sparsificationOperator+"_60";
+						} else if(durationInSecs > 7*86400 && durationInSecs <= 30*86400) { 
+							logger.info("Duration more than a week and less than a month - using bin size of 900 " + pvName);
+							sparsificationOperator = sparsificationOperator+"_900";
+						} else { 
+							logger.info("Duration more than a month - using bin size of 3600 " + pvName);
+							sparsificationOperator = sparsificationOperator+"_3600";
+						}
+					} else { 
+						logger.info(pvName + " has an operator specified; using that instead.");
 					}
 				}
-
-
+				
 				long before = System.currentTimeMillis();
 				// The path here does not have the retrieval as we need the ping which is also part of the retrieval war.
 				RawDataRetrieval rawDataRetrieval = new RawDataRetrieval(serverURL + "/data/getData.raw");
 				HashMap<String, String> extraParams = new HashMap<String,String>();
 				extraParams.put("ca_count", Integer.toString(requestedNumberOfValues));
 				extraParams.put("ca_how", requestedMethodKey);
-				if(postProcessor != null) {
-					extraParams.put("pp", postProcessor);					
+				if(sparsificationOperator != null) {
+					extraParams.put("pp", sparsificationOperator);					
 				}
 				GenMsgIterator strm = rawDataRetrieval.getDataForPV(pvName, start, end, useReducedDataset, extraParams);
 

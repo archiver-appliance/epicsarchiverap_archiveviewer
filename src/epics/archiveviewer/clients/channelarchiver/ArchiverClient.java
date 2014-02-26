@@ -165,7 +165,12 @@ public class ArchiverClient implements ClientPlugin
 
 		Vector params = new Vector();
 
-                if (request.getIncludeSparcified())
+		boolean includeSparcified = true;
+		// Does the ChannelArchiver support operators?
+		if(request.getSparsificationOperator() != null & request.getSparsificationOperator().equals("Raw")) { 
+			includeSparcified = false;
+		}
+                if (includeSparcified)
                 {
                     ArchiveDirectory[] ads = getAvailableArchiveDirectories();
 
