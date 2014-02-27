@@ -222,6 +222,7 @@ public class RawPBPlugin implements ClientPlugin {
 						}
 					} else { 
 						logger.info(pvName + " has an operator specified; using that instead.");
+						sparsificationOperator = null;
 					}
 				}
 				
