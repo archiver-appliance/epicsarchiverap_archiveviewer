@@ -1,7 +1,6 @@
 package epics.archiveviewer.clients.appliancearchiver;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -234,7 +232,7 @@ public class RawPBPlugin implements ClientPlugin {
 				extraParams.put("ca_count", Integer.toString(requestedNumberOfValues));
 				extraParams.put("ca_how", requestedMethodKey);
 				if(sparsificationOperator != null) {
-					extraParams.put("pp", sparsificationOperator);					
+					extraParams.put("pp", sparsificationOperator);
 				}
 				GenMsgIterator strm = rawDataRetrieval.getDataForPV(pvName, start, end, useReducedDataset, extraParams);
 
@@ -265,11 +263,15 @@ public class RawPBPlugin implements ClientPlugin {
 					} finally {
 						strm.close();
 					}
+					
+					if(sparsificationOperator != null && this.avEntry.getMetaData() != null) { 
+						this.avEntry.getMetaData().put("Sparsification", sparsificationOperator);
+					}
 
 					long after = System.currentTimeMillis();
 					logger.info("Retrieved " + totalValues	+ " values  for pv " + pvName + " in " + (after-before) + "(ms)");
 				}
-
+				
 			} catch(Throwable t) {
 				logger.log(Level.SEVERE, "Exception fetching data for pv " + pvName, t);
 				t.printStackTrace();

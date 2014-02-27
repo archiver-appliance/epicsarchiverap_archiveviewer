@@ -49,9 +49,15 @@ public class AVXALUtilities {
     	sb.append(g.getAVEntry().getArchiveDirectory().getName());
     	sb.append("\n");
     	
+    	Map m = g.getAVEntry().getMetaData();
+
     	//time axis
     	sb.append("x :");
     	sb.append(g.getTimeAxisLabel());
+    	if(m != null && !m.isEmpty() && m.containsKey("Sparsification")) { 
+    		sb.append(" " + m.get("Sparsification"));
+    	}
+    	
     	sb.append("\n");
     	//range axis
     	sb.append("y: ");
@@ -62,7 +68,6 @@ public class AVXALUtilities {
     	else
     		sb.append(rangeAxisLabel);
     	sb.append("\n");
-    	Map m = g.getAVEntry().getMetaData();
     	if(m != null && m.isEmpty() == false)
     	{	
 	    	Iterator metaIt = m.entrySet().iterator();
