@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.epics.archiverappliance.retrieval.client.EpicsMessage;
@@ -72,6 +73,15 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 				events.add(fakeMessage);
 			}
 		}
+		
+		if(dbrevent.hasFieldValues()) { 
+			Map<String, Object> m = this.avEntry.getMetaData();
+			HashMap<String, String> fieldValues = dbrevent.getFieldValues();
+			for(Entry<String, String> metaField : fieldValues.entrySet()) { 
+				m.put(mapFieldName(metaField.getKey()), metaField.getValue());
+			}
+		}
+		
 		double val = dbrevent.getNumberValue().doubleValue();
 		if(Double.isNaN(val) || Double.isInfinite(val)) { 
 			// Skipping adding NAN's and infinities.
