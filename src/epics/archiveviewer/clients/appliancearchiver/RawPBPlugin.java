@@ -203,6 +203,7 @@ public class RawPBPlugin implements ClientPlugin {
 				// We based the postProcessor decision on the sparsification operator and the duration of the request
 				if(sparsificationOperator.equalsIgnoreCase("Raw")) { 
 					logger.info("Skipping computation of bin size as the user asked for raw data");
+					sparsificationOperator = null;
 				} else { 
 					if(!pvName.contains("(")) { 
 						logger.info("Using operator " + sparsificationOperator);
@@ -223,6 +224,13 @@ public class RawPBPlugin implements ClientPlugin {
 					} else { 
 						logger.info(pvName + " has an operator specified; using that instead.");
 						sparsificationOperator = null;
+						if(pvName.startsWith("raw(") || pvName.startsWith("Raw(")) { 
+							logger.info("PVName starts with raw( - stripping it out");
+							pvName = pvName.replace("raw(", "");
+							pvName = pvName.replace("Raw(", "");
+							pvName = pvName.replace(")", "");							
+							logger.info("After stripping out raw() from pvName, pvName is" + pvName);
+						}
 					}
 				}
 				
