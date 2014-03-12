@@ -33,7 +33,7 @@ public class AVEsSelectorPanel extends AVAbstractPanel
         private JLabel densityLabel;
 	private JComboBox densitySelectionBox;
 
-	private String sparsificationOperators[] = {"firstSample", "mean", "median", "min", "max", "Raw"};
+	private String sparsificationOperators[] = {"firstSample", "lastFill", "mean", "median", "min", "max", "Raw"};
 
 	private JButton searchButton;
 	private JTextField inputField;
