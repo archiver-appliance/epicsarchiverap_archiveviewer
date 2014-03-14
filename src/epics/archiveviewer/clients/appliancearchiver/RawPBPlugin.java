@@ -256,7 +256,7 @@ public class RawPBPlugin implements ClientPlugin {
 					.setType(PayloadType.SCALAR_DOUBLE)
 					.setYear(startCal.get(Calendar.YEAR)).build();
 				}
-				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, info);
+				EventStreamValuesContainer currentVals = new EventStreamValuesContainer(avEntry, info, sparsificationOperator);
 				valueContainers[resultIndex] = currentVals;
 				if(strm != null) { 
 					strm.onInfoChange(currentVals);

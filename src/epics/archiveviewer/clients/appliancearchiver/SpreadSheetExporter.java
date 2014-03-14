@@ -31,7 +31,7 @@ public class SpreadSheetExporter {
 		// indexes represents the current event that is used to generate the data
 		int[] indexes = new int[srcValueContainers.length];
 		for(int i = 0; i < srcValueContainers.length; i++) { 
-			returnValueContainers[i] = new EventStreamValuesContainer(srcValueContainers[i].getAVEntry(), srcValueContainers[i].getPayloadInfo());
+			returnValueContainers[i] = new EventStreamValuesContainer(srcValueContainers[i].getAVEntry(), srcValueContainers[i].getPayloadInfo(), srcValueContainers[i].getSparsificationOperator());
 			indexes[i] = -1;
 		}
 	

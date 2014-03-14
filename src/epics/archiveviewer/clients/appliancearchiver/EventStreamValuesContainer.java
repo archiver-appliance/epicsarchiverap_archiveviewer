@@ -33,6 +33,7 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 	private double maxValue = Double.MIN_VALUE;
 	private double minPosValue = Double.MAX_VALUE;
 	private DecimalFormat formatter = new DecimalFormat();
+	private String sparsificationOperator = null;
 	
 	long minTimeMs = Long.MAX_VALUE;
 	long maxTimeMs = 0L;
@@ -52,6 +53,11 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 			formatter.setMaximumFractionDigits(Integer.parseInt(headers.get("PREC")));
 		}
 		handleInfoChange(desc);
+	}
+	
+	public EventStreamValuesContainer(AVEntry av, EPICSEvent.PayloadInfo desc, String sparsificationOperator) {
+		this(av, desc);
+		this.sparsificationOperator = sparsificationOperator;
 	}
 	
 	public void add(EpicsMessage dbrevent, boolean addFakeEvents) throws IOException {
@@ -130,13 +136,22 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	@Override
 	public String getDisplayLabel(int index) throws Exception {
+		StringBuilder ret = new StringBuilder();
+		
 		if(payloadInfo.getType().getNumber() >= 7) {
-			return "Waveform";
+			ret.append("Waveform");
+			return ret.toString();
 		}
 	
 		if (this.isValid(index))
 		{
-			return valueToString(index, 0);
+			ret.append(valueToString(index, 0));
+			// Ask the users if they want severity here.
+			// ret.append("\n" + computeSeverityLabel(events.get(index).getSeverity()));
+			if(this.sparsificationOperator != null) { 
+				ret.append("\n" + this.sparsificationOperator);
+			}
+			return ret.toString();
 		}
 
 		return computeSeverityLabel(events.get(index).getSeverity());
@@ -347,5 +362,9 @@ public class EventStreamValuesContainer implements ValuesContainer, InfoChangeHa
 
 	public Vector<EpicsMessage> getEvents() {
 		return events;
+	}
+
+	public String getSparsificationOperator() {
+		return sparsificationOperator;
 	}
 }
