@@ -11,11 +11,11 @@
 	<classpathentry kind="lib" path="ext_jars/jrendezvous.jar"/>
 	<classpathentry kind="lib" path="ext_jars/junit.jar"/>
 	<classpathentry kind="lib" path="ext_jars/mem-moni.jar"/>
-	<classpathentry kind="lib" path="ext_jars/pbrawclient-0.0.1.jar"/>
 	<classpathentry kind="lib" path="ext_jars/protobuf-java-2.4.1.jar"/>
 	<classpathentry kind="lib" path="ext_jars/servlet.jar"/>
 	<classpathentry kind="lib" path="ext_jars/xal.jar"/>
 	<classpathentry kind="lib" path="ext_jars/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="ext_jars/xmlrpc-1.1.jar" sourcepath="C:/Temp/xmlrpcsr.jar"/>
+	<classpathentry kind="lib" path="ext_jars/pbrawclient-0.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
