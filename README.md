@@ -1,14 +1,18 @@
 -*- outline -*- (use EMACS to see this in outline-mode)
 
+This is a customization of the EPICS archiveviewer with plugins for the EPICS archiver appliance.
+
+The original README follows:
+
 This readme is about building and running ArchiveViewer.
 
 * Intro
-The sources for this application are CVS-controlled:
+The original sources for this application are CVS-controlled:
 CVS root: ics-srv01.sns.ornl.gov:/sns/ADE/cvsroot
 Module:   archive_viewer
 Tag:      check out from HEAD
 
-ArchiveViewer requires JRE1.4.2 which can be downloaded at http://java.sun.com
+ArchiveViewer requires JRE which can be downloaded at http://java.sun.com
 Example for getting a specific release:
 cvs -d :ext:serge@ics-srv01.sns.ornl.gov:/sns/ADE/cvsroot \
      co archive_viewer
